@@ -201,7 +201,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.foregroundDisabled,
+                    color: AppColors.foreground,
                   ),
                 ),
               ],

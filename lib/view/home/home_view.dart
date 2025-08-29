@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:video_editor/core/constants/app_colors.dart';
+import 'package:video_editor/model/video/video_model.dart';
+import 'package:video_editor/view/widgets/widgets.dart';
+import 'package:video_editor/viewmodel/home_viewmodel.dart';
 
-class HomeView extends StatefulWidget {
+class HomeView extends ConsumerWidget {
   const HomeView({super.key});
 
   @override
-  State<HomeView> createState() => _HomeViewState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final homeState = ref.watch(homeViewModelProvider);
 
-class _HomeViewState extends State<HomeView> {
-  // Mock data - será substituído por dados reais do banco
-  final List<Map<String, dynamic>> _videos = [];
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -39,9 +37,29 @@ class _HomeViewState extends State<HomeView> {
               color: AppColors.foreground,
             ),
           ),
+          // Botão para simular erro (apenas para demonstração)
+          IconButton(
+            onPressed: () {
+              ref.read(homeViewModelProvider.notifier).simulateError();
+            },
+            icon: const Icon(
+              Icons.bug_report,
+              color: AppColors.error,
+            ),
+          ),
         ],
       ),
-      body: _videos.isEmpty ? _buildEmptyState() : _buildVideoList(),
+      body: StateBuilder<List<VideoModel>>(
+        state: homeState,
+        emptyTitle: 'Nenhum vídeo ainda',
+        emptySubtitle: 'Comece criando seu primeiro vídeo editado',
+        emptyIcon: Icons.video_library_outlined,
+        emptyAction: () => context.go('/editor'),
+        emptyActionText: 'Criar Primeiro Vídeo',
+        contentBuilder: (context, videos) =>
+            _buildVideoList(context, ref, videos),
+        errorBuilder: (context, error) => _buildErrorState(context, ref, error),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           context.go('/editor');
@@ -54,241 +72,105 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Icon(
-              Icons.video_library_outlined,
-              size: 60,
-              color: AppColors.foregroundDisabled,
-            ),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'Nenhum vídeo ainda',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: AppColors.foreground,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Comece criando seu primeiro vídeo editado',
-            style: TextStyle(
-              fontSize: 16,
-              color: AppColors.foregroundSecondary,
-            ),
-          ),
-          const SizedBox(height: 32),
-          ElevatedButton.icon(
-            onPressed: () {
-              context.go('/editor');
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: AppColors.foreground,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 12,
+  Widget _buildVideoList(
+    BuildContext context,
+    WidgetRef ref,
+    List<VideoModel> videos,
+  ) {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      itemCount: videos.length,
+      itemBuilder: (context, index) {
+        final video = videos[index];
+        return VideoCard.interactive(
+          video: video,
+          onTap: () {
+            // TODO: Implementar visualização do vídeo
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Reproduzindo: ${video.title}'),
+                backgroundColor: AppColors.primary,
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+            );
+          },
+          onEdit: () {
+            // TODO: Implementar edição do vídeo
+            context.go('/editor');
+          },
+          onShare: () {
+            // TODO: Implementar compartilhamento
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Compartilhando: ${video.title}'),
+                backgroundColor: AppColors.primary,
               ),
-            ),
-            icon: const Icon(Icons.add),
-            label: const Text('Criar Primeiro Vídeo'),
-          ),
-        ],
-      ),
+            );
+          },
+          onDelete: () {
+            _handleDeleteVideo(context, ref, video);
+          },
+        );
+      },
     );
   }
 
-  Widget _buildVideoList() => ListView.builder(
-    padding: const EdgeInsets.all(16),
-    itemCount: _videos.length,
-    itemBuilder: (context, index) {
-      final video = _videos[index];
-      return _buildVideoCard(video);
-    },
-  );
-
-  Widget _buildVideoCard(Map<String, dynamic> video) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.foregroundSecondary.withOpacity(0.1),
-          width: 1,
-        ),
-      ),
+  Widget _buildErrorState(BuildContext context, WidgetRef ref, String error) {
+    return Center(
       child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Thumbnail placeholder
             Container(
-              width: 80,
-              height: 60,
+              width: 120,
+              height: 120,
               decoration: BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.circular(8),
+                color: AppColors.error.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
               ),
-              child: Icon(
-                Icons.play_circle_outline,
-                color: AppColors.foregroundSecondary,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 16),
-
-            // Video info
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    video['title'],
-                    style: const TextStyle(
-                      color: AppColors.foreground,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Text(
-                        video['duration'],
-                        style: TextStyle(
-                          color: AppColors.foregroundSecondary,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '•',
-                        style: TextStyle(
-                          color: AppColors.foregroundSecondary,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        video['fileSize'],
-                        style: TextStyle(
-                          color: AppColors.foregroundSecondary,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      _buildStatusChip(video['status']),
-                      const SizedBox(width: 8),
-                      Text(
-                        video['createdAt'],
-                        style: TextStyle(
-                          color: AppColors.foregroundSecondary.withOpacity(0.7),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+              child: const Icon(
+                Icons.error_outline,
+                size: 60,
+                color: AppColors.error,
               ),
             ),
-
-            // Actions
-            PopupMenuButton<String>(
-              icon: Icon(
-                Icons.more_vert,
+            const SizedBox(height: 24),
+            const Text(
+              'Ops! Algo deu errado',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: AppColors.foreground,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error,
+              style: const TextStyle(
+                fontSize: 16,
                 color: AppColors.foregroundSecondary,
               ),
-              color: AppColors.background,
-              onSelected: (value) {
-                _handleVideoAction(value, video);
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              onPressed: () {
+                ref.read(homeViewModelProvider.notifier).clearError();
               },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'play',
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.play_arrow,
-                        color: AppColors.foregroundSecondary,
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Reproduzir',
-                        style: TextStyle(color: AppColors.foreground),
-                      ),
-                    ],
-                  ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.foreground,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
                 ),
-                PopupMenuItem(
-                  value: 'edit',
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.edit,
-                        color: AppColors.foregroundSecondary,
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Editar',
-                        style: TextStyle(color: AppColors.foreground),
-                      ),
-                    ],
-                  ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                PopupMenuItem(
-                  value: 'share',
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.share,
-                        color: AppColors.foregroundSecondary,
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Compartilhar',
-                        style: TextStyle(color: AppColors.foreground),
-                      ),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.delete,
-                        color: AppColors.error,
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Excluir',
-                        style: TextStyle(color: AppColors.error),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+              ),
+              icon: const Icon(Icons.refresh),
+              label: const Text('Tentar Novamente'),
             ),
           ],
         ),
@@ -296,137 +178,38 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget _buildStatusChip(String status) {
-    Color color;
-    String text;
-    IconData icon;
-
-    switch (status) {
-      case 'completed':
-        color = AppColors.success;
-        text = 'Concluído';
-        icon = Icons.check_circle;
-        break;
-      case 'processing':
-        color = AppColors.warning;
-        text = 'Processando';
-        icon = Icons.hourglass_empty;
-        break;
-      case 'failed':
-        color = AppColors.error;
-        text = 'Falhou';
-        icon = Icons.error;
-        break;
-      default:
-        color = AppColors.foregroundSecondary;
-        text = 'Desconhecido';
-        icon = Icons.help;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 12,
-            color: color,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            text,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _handleVideoAction(String action, Map<String, dynamic> video) {
-    switch (action) {
-      case 'play':
-        // TODO: Implementar reprodução
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Reproduzindo: ${video['title']}'),
-            backgroundColor: AppColors.primary,
-          ),
-        );
-        break;
-      case 'edit':
-        // TODO: Ir para editor com vídeo carregado
-        context.go('/editor');
-        break;
-      case 'share':
-        // TODO: Implementar compartilhamento
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Compartilhando: ${video['title']}'),
-            backgroundColor: AppColors.primary,
-          ),
-        );
-        break;
-      case 'delete':
-        _showDeleteConfirmation(video);
-        break;
-    }
-  }
-
-  void _showDeleteConfirmation(Map<String, dynamic> video) {
-    showDialog(
+  void _handleDeleteVideo(
+    BuildContext context,
+    WidgetRef ref,
+    VideoModel video,
+  ) {
+    GenericDeleteDialog.showVideoDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: const Text(
-          'Excluir vídeo',
-          style: TextStyle(color: AppColors.foreground),
-        ),
-        content: Text(
-          'Tem certeza que deseja excluir "${video['title']}"?',
-          style: TextStyle(color: AppColors.foregroundSecondary),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              'Cancelar',
-              style: TextStyle(color: AppColors.foregroundSecondary),
+      videoTitle: video.title,
+      onConfirmDelete: () {
+        // Remove o vídeo usando o ViewModel
+        ref.read(homeViewModelProvider.notifier).removeVideo(video.id);
+
+        // Mostrar feedback de sucesso
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${video.title} foi excluído'),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            action: SnackBarAction(
+              label: 'Desfazer',
+              textColor: AppColors.foreground,
+              onPressed: () {
+                // Adiciona o vídeo de volta usando o ViewModel
+                ref.read(homeViewModelProvider.notifier).addVideo(video);
+              },
             ),
           ),
-          TextButton(
-            onPressed: () {
-              // TODO: Implementar exclusão
-              Navigator.of(context).pop();
-              setState(() {
-                _videos.removeWhere((v) => v['id'] == video['id']);
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${video['title']} foi excluído'),
-                  backgroundColor: AppColors.error,
-                ),
-              );
-            },
-            child: const Text(
-              'Excluir',
-              style: TextStyle(color: AppColors.error),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
