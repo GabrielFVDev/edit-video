@@ -6,7 +6,14 @@ import '../../states/states.dart';
 
 // Auth ViewModel
 class LoginViewModel extends StateNotifier<AuthState> {
-  LoginViewModel() : super(const AuthState());
+  LoginViewModel()
+    : super(
+        const AuthState(),
+      );
+
+  Future handleLogin(String name, String email) async {
+    await login(name, email);
+  }
 
   // Simula login (futuramente conectará com banco/API)
   Future<bool> login(String name, String email) async {

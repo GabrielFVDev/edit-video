@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:video_editor/states/states.dart';
+import 'package:video_editor/viewmodel/login/login_viewmodel.dart';
 
-class LoginView extends StatefulWidget {
+import '../widgets/buttons/primary_button.dart';
+import '../widgets/loading/custom_loading.dart';
+
+class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  ConsumerState<LoginView> createState() => _LoginViewState();
 }
 
-class _LoginViewState extends State<LoginView> {
+class _LoginViewState extends ConsumerState<LoginView> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _nameController = TextEditingController();
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -22,27 +27,56 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Future<void> _handleLogin() async {
+    // ✅ ESPECIALISTA: Validação local primeiro (UX mais rápida)
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+    // ✅ ESPECIALISTA: Evita múltiplos cliques durante loading
+    if (ref.read(loginViewModelProvider).isLoading) return;
 
-    // Simula processo de login
-    await Future.delayed(const Duration(seconds: 2));
-
-    // TODO: Implementar lógica real de autenticação
-    // Por enquanto, vamos direto para home
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-      context.go('/home');
-    }
+    // ✅ ESPECIALISTA: Chama o ViewModel
+    await ref
+        .read(loginViewModelProvider.notifier)
+        .handleLogin(
+          _nameController.text.trim(),
+          _emailController.text.trim(),
+        );
   }
 
   @override
   Widget build(BuildContext context) {
+    // ✅ ESPECIALISTA: Observa o estado reativo
+    final authState = ref.watch(loginViewModelProvider);
+
+    // ✅ ESPECIALISTA: Side effects - escuta mudanças sem rebuild
+    ref.listen<AuthState>(
+      loginViewModelProvider,
+      (AuthState? previous, AuthState next) {
+        // Navegação após sucesso
+        if (next.isAuthenticated && !(previous?.isAuthenticated ?? false)) {
+          context.go('/home');
+        }
+
+        // Mostrar erros
+        if (next.error != null && next.error != previous?.error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(next.error!),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+
+          // ✅ ESPECIALISTA: Auto-limpar erro após mostrar
+          Future.delayed(const Duration(milliseconds: 100), () {
+            if (mounted) {
+              ref.read(loginViewModelProvider.notifier).clearError();
+            }
+          });
+        }
+      },
+    );
+
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A1A),
       body: SafeArea(
@@ -91,10 +125,11 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 const SizedBox(height: 48),
 
-                // Campo Nome
+                // ✅ ESPECIALISTA: Campo Nome com validação otimizada
                 TextFormField(
                   controller: _nameController,
                   style: const TextStyle(color: Colors.white),
+                  textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: 'Nome',
                     labelStyle: TextStyle(
@@ -123,10 +158,11 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 const SizedBox(height: 16),
 
-                // Campo Email
+                // ✅ ESPECIALISTA: Campo Email com validação melhorada
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.done,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     labelText: 'Email',
@@ -155,40 +191,20 @@ class _LoginViewState extends State<LoginView> {
                     }
                     return null;
                   },
+                  onFieldSubmitted: (_) => _handleLogin(),
                 ),
                 const SizedBox(height: 32),
 
-                // Botão de Login
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _handleLogin,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6366F1),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white,
-                            ),
-                          ),
-                        )
-                      : const Text(
-                          'Entrar',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                // ✅ ESPECIALISTA: PrimaryButton integrado com estado
+                PrimaryButton(
+                  label: 'Entrar',
+                  state: authState.isLoading
+                      ? ButtonState.loading
+                      : ButtonState.normal,
+                  loadingType: LoadingType.circular,
+                  onPressed: authState.isLoading ? null : _handleLogin,
                 ),
+
                 const SizedBox(height: 24),
 
                 // Texto informativo

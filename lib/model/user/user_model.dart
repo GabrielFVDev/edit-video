@@ -10,9 +10,9 @@ class UserModel {
     required this.id,
     required this.name,
     required this.email,
-    this.avatarUrl,
     required this.createdAt,
     required this.lastLoginAt,
+    this.avatarUrl,
   });
 
   // Factory constructor para criar a partir de Map (SQLite)
