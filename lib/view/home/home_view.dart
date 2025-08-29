@@ -113,16 +113,14 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget _buildVideoList() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _videos.length,
-      itemBuilder: (context, index) {
-        final video = _videos[index];
-        return _buildVideoCard(video);
-      },
-    );
-  }
+  Widget _buildVideoList() => ListView.builder(
+    padding: const EdgeInsets.all(16),
+    itemCount: _videos.length,
+    itemBuilder: (context, index) {
+      final video = _videos[index];
+      return _buildVideoCard(video);
+    },
+  );
 
   Widget _buildVideoCard(Map<String, dynamic> video) {
     return Container(
