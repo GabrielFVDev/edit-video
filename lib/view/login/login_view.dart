@@ -197,7 +197,7 @@ class _LoginViewState extends State<LoginView> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white.withOpacity(0.5),
+                    color: Colors.white.withAlpha(5),
                   ),
                 ),
               ],
