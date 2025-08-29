@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_editor/states/states.dart';
 import '../../model/models.dart';
 

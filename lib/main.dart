@@ -1,13 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:video_editor/core/routes.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:video_editor/core/config/routes.dart';
 import 'package:video_editor/core/constants/app_colors.dart';
+import 'package:video_editor/bloc/blocs.dart';
 
 void main() {
   runApp(
-    // ProviderScope é necessário para usar Riverpod
-    const ProviderScope(
-      child: MyApp(),
+    MultiBlocProvider(
+      providers: [
+        // BlocProvider para BLoC da tela Home
+        BlocProvider(
+          create: (_) => HomeBloc(),
+        ),
+        // BlocProvider para BLoC da tela Login
+        BlocProvider(
+          create: (_) => LoginBloc(),
+        ),
+        // BlocProvider para BLoC da tela Splash
+        BlocProvider(
+          create: (_) => SplashBloc(),
+        ),
+        // BlocProvider para BLoC da tela Editor
+        BlocProvider(
+          create: (_) => EditorBloc(),
+        ),
+      ],
+      child: const MyApp(),
     ),
   );
 }

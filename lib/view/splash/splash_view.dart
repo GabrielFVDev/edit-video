@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:video_editor/states/states.dart';
 import '../../viewmodel/viewmodels.dart';
 
-class SplashView extends ConsumerStatefulWidget {
+class SplashView extends StatefulWidget {
   const SplashView({super.key});
 
   @override
-  ConsumerState<SplashView> createState() => _SplashViewState();
+  State<SplashView> createState() => _SplashViewState();
 }
 
-class _SplashViewState extends ConsumerState<SplashView>
+class _SplashViewState extends State<SplashView>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -23,9 +22,9 @@ class _SplashViewState extends ConsumerState<SplashView>
     _setupAnimations();
 
     // Inicia a inicialização do app via ViewModel
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(splashViewModelProvider.notifier).initializeApp();
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   context.read(splashViewModelProvider.notifier).initializeApp();
+    // });
   }
 
   @override
