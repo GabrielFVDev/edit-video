@@ -114,13 +114,14 @@ class PrimaryButton extends StatelessWidget {
     double width = double.infinity,
     double height = 48,
     IconData? icon,
+    BorderRadiusGeometry? borderRadius,
   }) {
     return PrimaryButton._outlined(
       key: key,
       label: label,
       onPressed: onPressed,
       state: state,
-      borderRadius: BorderRadius.circular(height * 0.5),
+      borderRadius: borderRadius ?? BorderRadius.circular(height * 0.5),
       color: color,
       width: width,
       height: height,
@@ -145,6 +146,7 @@ class PrimaryButton extends StatelessWidget {
     StateButton state = StateButton.success,
     Color color = Colors.transparent,
     double width = double.infinity,
+    BorderRadiusGeometry? borderRadius,
     double height = 48,
     IconData? icon,
   }) {
@@ -152,7 +154,7 @@ class PrimaryButton extends StatelessWidget {
       label: label,
       onPressed: onPressed,
       state: state,
-      borderRadius: BorderRadius.zero,
+      borderRadius: borderRadius ?? BorderRadius.zero,
       color: color,
       width: width,
       height: height,
@@ -179,13 +181,14 @@ class PrimaryButton extends StatelessWidget {
     Color color = const Color(0xFF111111),
     double width = double.infinity,
     double height = 48,
+    BorderRadiusGeometry? borderRadius,
     IconData? icon,
   }) {
     return PrimaryButton._(
       label: label,
       onPressed: onPressed,
       state: state,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: borderRadius ?? BorderRadius.circular(8),
       color: color,
       width: width,
       height: height,
@@ -213,12 +216,13 @@ class PrimaryButton extends StatelessWidget {
     double width = double.infinity,
     double height = 48,
     IconData? icon,
+    BorderRadiusGeometry? borderRadius,
   }) {
     return PrimaryButton._(
       label: label,
       onPressed: onPressed,
       state: state,
-      borderRadius: BorderRadius.circular(height * 0.5),
+      borderRadius: borderRadius ?? BorderRadius.circular(height * 0.5),
       color: color,
       width: width,
       height: height,
@@ -246,12 +250,13 @@ class PrimaryButton extends StatelessWidget {
     double width = 87,
     double height = 48,
     IconData? icon,
+    BorderRadiusGeometry? borderRadius,
   }) {
     return PrimaryButton._(
       label: label,
       onPressed: onPressed,
       state: state,
-      borderRadius: BorderRadius.circular(height * 0.5),
+      borderRadius: borderRadius ?? BorderRadius.circular(height * 0.5),
       color: color,
       width: width,
       height: height,
@@ -279,12 +284,13 @@ class PrimaryButton extends StatelessWidget {
     double width = 87,
     double height = 48,
     IconData? icon,
+    BorderRadiusGeometry? borderRadius,
   }) {
     return PrimaryButton._(
       label: label,
       onPressed: onPressed,
       state: state,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: borderRadius ?? BorderRadius.circular(8),
       color: color,
       width: width,
       height: height,

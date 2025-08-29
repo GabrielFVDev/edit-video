@@ -209,9 +209,10 @@ class _LoginViewState extends ConsumerState<LoginView> {
         ),
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 24.0),
+        padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 32.0),
         child: PrimaryButton.bigRounded(
           label: 'Entrar',
+          borderRadius: BorderRadius.circular(12),
           state: authState.isLoading
               ? StateButton.loading
               : StateButton.success,
