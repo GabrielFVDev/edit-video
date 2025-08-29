@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:video_editor/view/widgets/loading/custom_loading.dart';
+import 'package:video_editor/core/constants/app_colors.dart';
 
 /// Enum representing the possible states of [PrimaryButton]
 enum StateButton {
@@ -52,11 +53,11 @@ class PrimaryButton extends StatelessWidget {
     required this.onPressed,
     this.state = StateButton.success,
     this.borderRadius,
-    this.color = const Color(0xFF111111),
+    this.color = AppColors.buttonPrimary,
     this.width = 327,
     this.height = 48,
     this.icon,
-    this.borderColor = Colors.transparent,
+    this.borderColor = AppColors.transparent,
     required String factoryName,
   }) : _factoryName = factoryName;
 
@@ -74,7 +75,7 @@ class PrimaryButton extends StatelessWidget {
     required String label,
     required VoidCallback onPressed,
     StateButton state = StateButton.success,
-    Color color = const Color(0xFF111111),
+    Color color = AppColors.buttonPrimary,
     double width = double.infinity,
     double height = 48,
     IconData? icon,
@@ -109,8 +110,8 @@ class PrimaryButton extends StatelessWidget {
     required String label,
     required VoidCallback onPressed,
     StateButton state = StateButton.success,
-    Color color = Colors.transparent,
-    Color borderColor = const Color(0xFF111111),
+    Color color = AppColors.transparent,
+    Color borderColor = AppColors.buttonPrimary,
     double width = double.infinity,
     double height = 48,
     IconData? icon,
@@ -144,7 +145,7 @@ class PrimaryButton extends StatelessWidget {
     required String label,
     required VoidCallback onPressed,
     StateButton state = StateButton.success,
-    Color color = Colors.transparent,
+    Color color = AppColors.transparent,
     double width = double.infinity,
     BorderRadiusGeometry? borderRadius,
     double height = 48,
@@ -178,7 +179,7 @@ class PrimaryButton extends StatelessWidget {
     required String label,
     required VoidCallback onPressed,
     StateButton state = StateButton.success,
-    Color color = const Color(0xFF111111),
+    Color color = AppColors.buttonPrimary,
     double width = double.infinity,
     double height = 48,
     BorderRadiusGeometry? borderRadius,
@@ -212,7 +213,7 @@ class PrimaryButton extends StatelessWidget {
     required String label,
     required VoidCallback onPressed,
     StateButton state = StateButton.success,
-    Color color = const Color(0xFF111111),
+    Color color = AppColors.buttonPrimary,
     double width = double.infinity,
     double height = 48,
     IconData? icon,
@@ -246,7 +247,7 @@ class PrimaryButton extends StatelessWidget {
     required String label,
     required VoidCallback onPressed,
     StateButton state = StateButton.success,
-    Color color = const Color(0xFF111111),
+    Color color = AppColors.buttonPrimary,
     double width = 87,
     double height = 48,
     IconData? icon,
@@ -280,7 +281,7 @@ class PrimaryButton extends StatelessWidget {
     required String label,
     required VoidCallback onPressed,
     StateButton state = StateButton.success,
-    Color color = const Color(0xFF111111),
+    Color color = AppColors.buttonPrimary,
     double width = 87,
     double height = 48,
     IconData? icon,
@@ -309,8 +310,8 @@ class PrimaryButton extends StatelessWidget {
     required BorderRadiusGeometry borderRadius,
     required double width,
     required double height,
-    Color borderColor = const Color(0xFF111111),
-    Color color = Colors.transparent,
+    Color borderColor = AppColors.buttonPrimary,
+    Color color = AppColors.transparent,
     IconData? icon,
   }) {
     return PrimaryButton._(
@@ -338,13 +339,13 @@ class PrimaryButton extends StatelessWidget {
     /// Gets the background color based on the button state and style
     Color getColorState(StateButton state) {
       if (_factoryName == 'onlyText' || _factoryName == 'outlined') {
-        return Colors.transparent;
+        return AppColors.transparent;
       }
 
       return switch (state) {
-        StateButton.success => const Color(0xFF111111),
-        StateButton.disabled => const Color(0xFFB6B6B6),
-        StateButton.error => const Color(0xFFFF0073),
+        StateButton.success => AppColors.buttonPrimary,
+        StateButton.disabled => AppColors.buttonDisabled,
+        StateButton.error => AppColors.buttonError,
         StateButton.loading => color,
       };
     }
@@ -352,14 +353,14 @@ class PrimaryButton extends StatelessWidget {
     /// Gets the border color based on the button state and style
     Color getColorBorder(StateButton state) {
       if (_factoryName == 'onlyText') {
-        return Colors.transparent;
+        return AppColors.transparent;
       }
 
       return switch (state) {
-        StateButton.success => const Color(0xFF111111),
-        StateButton.disabled => const Color(0xFFB6B6B6),
-        StateButton.error => const Color(0xFFFF0073),
-        StateButton.loading => Colors.transparent,
+        StateButton.success => AppColors.buttonPrimary,
+        StateButton.disabled => AppColors.buttonDisabled,
+        StateButton.error => AppColors.buttonError,
+        StateButton.loading => AppColors.transparent,
       };
     }
 
@@ -367,18 +368,18 @@ class PrimaryButton extends StatelessWidget {
     Color getColorText(StateButton state) {
       if (_factoryName == 'onlyText' || _factoryName == 'outlined') {
         return switch (state) {
-          StateButton.success => const Color(0xFF111111),
-          StateButton.disabled => const Color(0xFF717171),
-          StateButton.error => const Color(0xFFFF0073),
-          StateButton.loading => const Color(0xFF111111),
+          StateButton.success => AppColors.buttonPrimary,
+          StateButton.disabled => AppColors.buttonDisabled,
+          StateButton.error => AppColors.buttonError,
+          StateButton.loading => AppColors.buttonPrimary,
         };
       }
 
       return switch (state) {
-        StateButton.success => Colors.white,
-        StateButton.disabled => const Color(0xFF717171),
-        StateButton.error => Colors.white,
-        StateButton.loading => Colors.white,
+        StateButton.success => AppColors.foreground,
+        StateButton.disabled => AppColors.buttonDisabled,
+        StateButton.error => AppColors.foreground,
+        StateButton.loading => AppColors.foreground,
       };
     }
 

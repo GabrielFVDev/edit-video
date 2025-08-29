@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_editor/core/routes.dart';
+import 'package:video_editor/core/constants/app_colors.dart';
 
 void main() {
   runApp(
@@ -24,9 +25,9 @@ class MyApp extends StatelessWidget {
         // Configuração de tema escuro para combinar com as telas
         brightness: Brightness.dark,
         primarySwatch: Colors.indigo,
-        scaffoldBackgroundColor: const Color(0xFF1A1A1A),
+        scaffoldBackgroundColor: AppColors.background,
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF1A1A1A),
+          backgroundColor: AppColors.background,
           elevation: 0,
         ),
       ),

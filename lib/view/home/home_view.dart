@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:video_editor/core/constants/app_colors.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -15,15 +16,15 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: AppColors.background,
         elevation: 0,
         title: const Text(
           'Meus Vídeos',
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.foreground,
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -35,7 +36,7 @@ class _HomeViewState extends State<HomeView> {
             },
             icon: const Icon(
               Icons.settings_outlined,
-              color: Colors.white,
+              color: AppColors.foreground,
             ),
           ),
         ],
@@ -45,8 +46,8 @@ class _HomeViewState extends State<HomeView> {
         onPressed: () {
           context.go('/editor');
         },
-        backgroundColor: const Color(0xFF6366F1),
-        foregroundColor: Colors.white,
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.foreground,
         icon: const Icon(Icons.add),
         label: const Text('Novo Vídeo'),
       ),
@@ -62,13 +63,13 @@ class _HomeViewState extends State<HomeView> {
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: const Color(0xFF2A2A2A),
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Icon(
               Icons.video_library_outlined,
               size: 60,
-              color: Colors.white.withAlpha(5),
+              color: AppColors.foregroundDisabled,
             ),
           ),
           const SizedBox(height: 24),
@@ -77,7 +78,7 @@ class _HomeViewState extends State<HomeView> {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppColors.foreground,
             ),
           ),
           const SizedBox(height: 8),
@@ -85,7 +86,7 @@ class _HomeViewState extends State<HomeView> {
             'Comece criando seu primeiro vídeo editado',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.white.withAlpha(7),
+              color: AppColors.foregroundSecondary,
             ),
           ),
           const SizedBox(height: 32),
@@ -94,8 +95,8 @@ class _HomeViewState extends State<HomeView> {
               context.go('/editor');
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6366F1),
-              foregroundColor: Colors.white,
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.foreground,
               padding: const EdgeInsets.symmetric(
                 horizontal: 24,
                 vertical: 12,
@@ -127,10 +128,10 @@ class _HomeViewState extends State<HomeView> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withOpacity(0.1),
+          color: AppColors.foregroundSecondary.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -143,12 +144,12 @@ class _HomeViewState extends State<HomeView> {
               width: 80,
               height: 60,
               decoration: BoxDecoration(
-                color: const Color(0xFF3A3A3A),
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 Icons.play_circle_outline,
-                color: Colors.white.withOpacity(0.7),
+                color: AppColors.foregroundSecondary,
                 size: 24,
               ),
             ),
@@ -162,7 +163,7 @@ class _HomeViewState extends State<HomeView> {
                   Text(
                     video['title'],
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.foreground,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -175,7 +176,7 @@ class _HomeViewState extends State<HomeView> {
                       Text(
                         video['duration'],
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: AppColors.foregroundSecondary,
                           fontSize: 14,
                         ),
                       ),
@@ -183,14 +184,14 @@ class _HomeViewState extends State<HomeView> {
                       Text(
                         '•',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: AppColors.foregroundSecondary,
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         video['fileSize'],
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: AppColors.foregroundSecondary,
                           fontSize: 14,
                         ),
                       ),
@@ -204,7 +205,7 @@ class _HomeViewState extends State<HomeView> {
                       Text(
                         video['createdAt'],
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.5),
+                          color: AppColors.foregroundSecondary.withOpacity(0.7),
                           fontSize: 12,
                         ),
                       ),
@@ -218,9 +219,9 @@ class _HomeViewState extends State<HomeView> {
             PopupMenuButton<String>(
               icon: Icon(
                 Icons.more_vert,
-                color: Colors.white.withOpacity(0.7),
+                color: AppColors.foregroundSecondary,
               ),
-              color: const Color(0xFF3A3A3A),
+              color: AppColors.background,
               onSelected: (value) {
                 _handleVideoAction(value, video);
               },
@@ -231,12 +232,12 @@ class _HomeViewState extends State<HomeView> {
                     children: [
                       Icon(
                         Icons.play_arrow,
-                        color: Colors.white.withOpacity(0.7),
+                        color: AppColors.foregroundSecondary,
                       ),
                       const SizedBox(width: 8),
                       const Text(
                         'Reproduzir',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: AppColors.foreground),
                       ),
                     ],
                   ),
@@ -247,12 +248,12 @@ class _HomeViewState extends State<HomeView> {
                     children: [
                       Icon(
                         Icons.edit,
-                        color: Colors.white.withOpacity(0.7),
+                        color: AppColors.foregroundSecondary,
                       ),
                       const SizedBox(width: 8),
                       const Text(
                         'Editar',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: AppColors.foreground),
                       ),
                     ],
                   ),
@@ -263,12 +264,12 @@ class _HomeViewState extends State<HomeView> {
                     children: [
                       Icon(
                         Icons.share,
-                        color: Colors.white.withOpacity(0.7),
+                        color: AppColors.foregroundSecondary,
                       ),
                       const SizedBox(width: 8),
                       const Text(
                         'Compartilhar',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: AppColors.foreground),
                       ),
                     ],
                   ),
@@ -279,12 +280,12 @@ class _HomeViewState extends State<HomeView> {
                     children: [
                       Icon(
                         Icons.delete,
-                        color: Colors.red.withOpacity(0.7),
+                        color: AppColors.error,
                       ),
                       const SizedBox(width: 8),
                       const Text(
                         'Excluir',
-                        style: TextStyle(color: Colors.red),
+                        style: TextStyle(color: AppColors.error),
                       ),
                     ],
                   ),
@@ -304,22 +305,22 @@ class _HomeViewState extends State<HomeView> {
 
     switch (status) {
       case 'completed':
-        color = Colors.green;
+        color = AppColors.success;
         text = 'Concluído';
         icon = Icons.check_circle;
         break;
       case 'processing':
-        color = Colors.orange;
+        color = AppColors.warning;
         text = 'Processando';
         icon = Icons.hourglass_empty;
         break;
       case 'failed':
-        color = Colors.red;
+        color = AppColors.error;
         text = 'Falhou';
         icon = Icons.error;
         break;
       default:
-        color = Colors.grey;
+        color = AppColors.foregroundSecondary;
         text = 'Desconhecido';
         icon = Icons.help;
     }
@@ -363,7 +364,7 @@ class _HomeViewState extends State<HomeView> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Reproduzindo: ${video['title']}'),
-            backgroundColor: const Color(0xFF6366F1),
+            backgroundColor: AppColors.primary,
           ),
         );
         break;
@@ -376,7 +377,7 @@ class _HomeViewState extends State<HomeView> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Compartilhando: ${video['title']}'),
-            backgroundColor: const Color(0xFF6366F1),
+            backgroundColor: AppColors.primary,
           ),
         );
         break;
@@ -390,21 +391,21 @@ class _HomeViewState extends State<HomeView> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2A2A2A),
+        backgroundColor: AppColors.surface,
         title: const Text(
           'Excluir vídeo',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: AppColors.foreground),
         ),
         content: Text(
           'Tem certeza que deseja excluir "${video['title']}"?',
-          style: TextStyle(color: Colors.white.withOpacity(0.7)),
+          style: TextStyle(color: AppColors.foregroundSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               'Cancelar',
-              style: TextStyle(color: Colors.white.withOpacity(0.7)),
+              style: TextStyle(color: AppColors.foregroundSecondary),
             ),
           ),
           TextButton(
@@ -417,13 +418,13 @@ class _HomeViewState extends State<HomeView> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('${video['title']} foi excluído'),
-                  backgroundColor: Colors.red,
+                  backgroundColor: AppColors.error,
                 ),
               );
             },
             child: const Text(
               'Excluir',
-              style: TextStyle(color: Colors.red),
+              style: TextStyle(color: AppColors.error),
             ),
           ),
         ],

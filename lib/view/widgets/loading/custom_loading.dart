@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:video_editor/core/constants/app_colors.dart';
 
 enum LoadingType { circular, dots, pulse, bounce }
 
@@ -11,7 +12,7 @@ class CustomLoading extends StatefulWidget {
   const CustomLoading({
     super.key,
     this.size = 20,
-    this.color = Colors.white,
+    this.color = AppColors.foreground,
     this.type = LoadingType.circular,
     this.strokeWidth = 2,
   });
@@ -20,7 +21,7 @@ class CustomLoading extends StatefulWidget {
   const CustomLoading.button({
     super.key,
     this.size = 20,
-    this.color = Colors.white,
+    this.color = AppColors.foreground,
     this.type = LoadingType.circular,
     this.strokeWidth = 2,
   });
@@ -29,7 +30,7 @@ class CustomLoading extends StatefulWidget {
   const CustomLoading.dots({
     super.key,
     this.size = 20,
-    this.color = Colors.white,
+    this.color = AppColors.foreground,
     this.type = LoadingType.dots,
     this.strokeWidth = 2,
   });
@@ -38,7 +39,7 @@ class CustomLoading extends StatefulWidget {
   const CustomLoading.pulse({
     super.key,
     this.size = 20,
-    this.color = Colors.white,
+    this.color = AppColors.foreground,
     this.type = LoadingType.pulse,
     this.strokeWidth = 2,
   });

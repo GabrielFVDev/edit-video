@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:video_editor/states/states.dart';
 import 'package:video_editor/viewmodel/login/login_viewmodel.dart';
+import 'package:video_editor/core/constants/app_colors.dart';
 
 import '../widgets/buttons/primary_button.dart';
 
@@ -60,7 +61,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(next.error!),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
               duration: const Duration(seconds: 3),
             ),
@@ -77,7 +78,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -94,13 +95,13 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF6366F1),
+                        color: AppColors.primary,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Icon(
                         Icons.video_collection_rounded,
                         size: 40,
-                        color: Colors.white,
+                        color: AppColors.foreground,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -109,7 +110,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: AppColors.foreground,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -117,7 +118,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       'Entre com seus dados para começar',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.white.withOpacity(0.7),
+                        color: AppColors.foregroundSecondary,
                       ),
                     ),
                   ],
@@ -127,22 +128,22 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 // ✅ ESPECIALISTA: Campo Nome com validação otimizada
                 TextFormField(
                   controller: _nameController,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.foreground),
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: 'Nome',
                     labelStyle: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: AppColors.foregroundSecondary,
                     ),
                     filled: true,
-                    fillColor: const Color(0xFF2A2A2A),
+                    fillColor: AppColors.surface,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
                     prefixIcon: Icon(
                       Icons.person_outline,
-                      color: Colors.white.withOpacity(0.7),
+                      color: AppColors.foregroundSecondary,
                     ),
                   ),
                   validator: (value) {
@@ -162,21 +163,21 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.done,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.foreground),
                   decoration: InputDecoration(
                     labelText: 'Email',
                     labelStyle: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: AppColors.foregroundSecondary,
                     ),
                     filled: true,
-                    fillColor: const Color(0xFF2A2A2A),
+                    fillColor: AppColors.surface,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
                     prefixIcon: Icon(
                       Icons.email_outlined,
-                      color: Colors.white.withOpacity(0.7),
+                      color: AppColors.foregroundSecondary,
                     ),
                   ),
                   validator: (value) {
@@ -200,7 +201,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white.withAlpha(5),
+                    color: AppColors.foregroundDisabled,
                   ),
                 ),
               ],
@@ -212,6 +213,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
         padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 32.0),
         child: PrimaryButton.bigRounded(
           label: 'Entrar',
+          color: AppColors.primary,
           borderRadius: BorderRadius.circular(12),
           state: authState.isLoading
               ? StateButton.loading
