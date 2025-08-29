@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:video_editor/states/states.dart';
+import '../../viewmodel/viewmodels.dart';
 
-class SplashView extends StatefulWidget {
+class SplashView extends ConsumerStatefulWidget {
   const SplashView({super.key});
 
   @override
-  State<SplashView> createState() => _SplashViewState();
+  ConsumerState<SplashView> createState() => _SplashViewState();
 }
 
-class _SplashViewState extends State<SplashView>
+class _SplashViewState extends ConsumerState<SplashView>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -18,7 +21,17 @@ class _SplashViewState extends State<SplashView>
   void initState() {
     super.initState();
     _setupAnimations();
-    _initializeApp();
+
+    // Inicia a inicialização do app via ViewModel
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(splashViewModelProvider.notifier).initializeApp();
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   void _setupAnimations() {
@@ -52,25 +65,32 @@ class _SplashViewState extends State<SplashView>
     _animationController.forward();
   }
 
-  Future<void> _initializeApp() async {
-    // Simula carregamento de inicializações
-    await Future.delayed(const Duration(milliseconds: 2500));
-
-    // TODO: Verificar se usuário já está logado
-    // Por enquanto, vamos direto para o login
-    if (mounted) {
-      context.go('/login');
-    }
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
+    // Escuta mudanças no estado do splash
+    ref.listen<SplashState>(splashViewModelProvider, (previous, next) {
+      switch (next.status) {
+        case SplashStatus.authenticated:
+          context.go('/home');
+          break;
+        case SplashStatus.unauthenticated:
+          context.go('/login');
+          break;
+        case SplashStatus.error:
+          // Mostrar erro e tentar novamente
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(next.error ?? 'Erro desconhecido'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          break;
+        case SplashStatus.loading:
+          // Continua na tela de splash
+          break;
+      }
+    });
+
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A1A),
       body: Center(

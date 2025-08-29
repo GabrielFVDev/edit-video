@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_editor/core/routes.dart';
 
 void main() {
   runApp(
-    const MyApp(),
+    // ProviderScope é necessário para usar Riverpod
+    const ProviderScope(
+      child: MyApp(),
+    ),
   );
 }
 
@@ -13,8 +17,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'EditorView',
+      title: 'VideoEditor',
+      debugShowCheckedModeBanner: false,
       routerConfig: router,
+      theme: ThemeData(
+        // Configuração de tema escuro para combinar com as telas
+        brightness: Brightness.dark,
+        primarySwatch: Colors.indigo,
+        scaffoldBackgroundColor: const Color(0xFF1A1A1A),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF1A1A1A),
+          elevation: 0,
+        ),
+      ),
     );
   }
 }
