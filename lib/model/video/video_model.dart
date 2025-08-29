@@ -190,7 +190,7 @@ class VideoModel {
 
   @override
   String toString() {
-    return 'VideoModel(id: $id, title: $title, status: $status, quality: $quality, duration: ${formattedDuration})';
+    return 'VideoModel(id: $id, title: $title, status: $status, quality: $quality, duration: $formattedDuration)';
   }
 
   @override

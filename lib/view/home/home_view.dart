@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:video_editor/core/constants/app_colors.dart';
 import 'package:video_editor/model/video/video_model.dart';
 import 'package:video_editor/view/widgets/widgets.dart';
-import 'package:video_editor/viewmodel/home_viewmodel.dart';
+import 'package:video_editor/bloc/blocs.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  @override
+  void initState() {
+    super.initState();
+    // Carregar vídeos na inicialização
+    context.read<HomeBloc>().add(const LoadVideos());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +50,7 @@ class HomeView extends StatelessWidget {
           // Botão para simular erro (apenas para demonstração)
           IconButton(
             onPressed: () {
-              ref.read(homeViewModelProvider.notifier).simulateError();
+              context.read<HomeBloc>().add(const SimulateError());
             },
             icon: const Icon(
               Icons.bug_report,
@@ -46,167 +59,165 @@ class HomeView extends StatelessWidget {
           ),
         ],
       ),
-      body: StateBuilder<List<VideoModel>>(
-        state: homeState,
-        emptyTitle: 'Nenhum vídeo ainda',
-        emptySubtitle: 'Comece criando seu primeiro vídeo editado',
-        emptyIcon: Icons.video_library_outlined,
-        emptyAction: () => context.go('/editor'),
-        emptyActionText: 'Criar Primeiro Vídeo',
-        contentBuilder: (context, videos) =>
-            _buildVideoList(context, ref, videos),
-        errorBuilder: (context, error) => _buildErrorState(context, ref, error),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          context.go('/editor');
+      body: BlocBuilder<HomeBloc, HomeState>(
+        builder: (context, state) {
+          if (state is HomeLoading) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: AppColors.primary,
+              ),
+            );
+          }
+
+          if (state is HomeError) {
+            return _buildErrorState(context, state);
+          }
+
+          if (state is HomeEmpty) {
+            return _buildEmptyState(context);
+          }
+
+          if (state is HomeLoaded) {
+            return _buildLoadedState(context, state);
+          }
+
+          return const SizedBox.shrink();
         },
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.foreground,
-        icon: const Icon(Icons.add),
-        label: const Text('Novo Vídeo'),
       ),
-    );
-  }
-
-  Widget _buildVideoList(
-    BuildContext context,
-    WidgetRef ref,
-    List<VideoModel> videos,
-  ) {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: videos.length,
-      itemBuilder: (context, index) {
-        final video = videos[index];
-        return VideoCard.interactive(
-          video: video,
-          onTap: () {
-            // TODO: Implementar visualização do vídeo
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Reproduzindo: ${video.title}'),
-                backgroundColor: AppColors.primary,
-              ),
-            );
-          },
-          onEdit: () {
-            // TODO: Implementar edição do vídeo
-            context.go('/editor');
-          },
-          onShare: () {
-            // TODO: Implementar compartilhamento
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Compartilhando: ${video.title}'),
-                backgroundColor: AppColors.primary,
-              ),
-            );
-          },
-          onDelete: () {
-            _handleDeleteVideo(context, ref, video);
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildErrorState(BuildContext context, WidgetRef ref, String error) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: AppColors.error.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Icon(
-                Icons.error_outline,
-                size: 60,
-                color: AppColors.error,
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Ops! Algo deu errado',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: AppColors.foreground,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error,
-              style: const TextStyle(
-                fontSize: 16,
-                color: AppColors.foregroundSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: () {
-                ref.read(homeViewModelProvider.notifier).clearError();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.foreground,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              icon: const Icon(Icons.refresh),
-              label: const Text('Tentar Novamente'),
-            ),
-          ],
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.push('/editor'),
+        backgroundColor: AppColors.primary,
+        child: const Icon(
+          Icons.add,
+          color: AppColors.onPrimary,
         ),
       ),
     );
   }
 
-  void _handleDeleteVideo(
-    BuildContext context,
-    WidgetRef ref,
-    VideoModel video,
-  ) {
-    GenericDeleteDialog.showVideoDialog(
-      context: context,
-      videoTitle: video.title,
-      onConfirmDelete: () {
-        // Remove o vídeo usando o ViewModel
-        ref.read(homeViewModelProvider.notifier).removeVideo(video.id);
-
-        // Mostrar feedback de sucesso
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${video.title} foi excluído'),
-            backgroundColor: AppColors.success,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+  Widget _buildErrorState(BuildContext context, HomeError state) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.error_outline,
+            size: 64,
+            color: AppColors.error,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Erro ao carregar vídeos',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.foreground.withOpacity(0.8),
             ),
-            action: SnackBarAction(
-              label: 'Desfazer',
-              textColor: AppColors.foreground,
-              onPressed: () {
-                // Adiciona o vídeo de volta usando o ViewModel
-                ref.read(homeViewModelProvider.notifier).addVideo(video);
+          ),
+          const SizedBox(height: 8),
+          Text(
+            state.message,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.foreground.withOpacity(0.6),
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () {
+              context.read<HomeBloc>().add(const ClearError());
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.onPrimary,
+            ),
+            child: const Text('Tentar Novamente'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.video_library_outlined,
+            size: 64,
+            color: AppColors.foregroundSecondary,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Nenhum vídeo encontrado',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.foreground.withOpacity(0.8),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Toque no botão + para adicionar seu primeiro vídeo',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.foreground.withOpacity(0.6),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoadedState(BuildContext context, HomeLoaded state) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        context.read<HomeBloc>().add(const RefreshVideos());
+      },
+      color: AppColors.primary,
+      child: Column(
+        children: [
+          if (state.isRefreshing)
+            const LinearProgressIndicator(
+              color: AppColors.primary,
+              backgroundColor: AppColors.surface,
+            ),
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: state.videos.length,
+              itemBuilder: (context, index) {
+                final video = state.videos[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: VideoCard(
+                    video: video,
+                    onTap: () => context.push('/editor', extra: video),
+                    onDelete: () => _showDeleteDialog(context, video),
+                  ),
+                );
               },
             ),
           ),
-        );
-      },
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context, VideoModel video) {
+    showDialog(
+      context: context,
+      builder: (context) => GenericDeleteDialog(
+        itemTitle: video.title,
+        itemType: 'vídeo',
+        onConfirmDelete: () {
+          context.read<HomeBloc>().add(RemoveVideo(video.id));
+          Navigator.of(context).pop();
+        },
+      ),
     );
   }
 }

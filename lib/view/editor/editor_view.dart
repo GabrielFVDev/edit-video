@@ -69,14 +69,14 @@ class _EditorViewState extends State<EditorView> {
                           color: const Color(0xFF2A2A2A),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.1),
+                            color: Colors.white.withAlpha(1),
                             width: 2,
                           ),
                         ),
                         child: Icon(
                           Icons.video_call_outlined,
                           size: 60,
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withAlpha(7),
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -94,7 +94,7 @@ class _EditorViewState extends State<EditorView> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withAlpha(7),
                         ),
                       ),
                       const SizedBox(height: 48),
@@ -128,7 +128,7 @@ class _EditorViewState extends State<EditorView> {
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.white,
                               side: BorderSide(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withAlpha(3),
                               ),
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
@@ -212,7 +212,7 @@ class _EditorViewState extends State<EditorView> {
           Text(
             'Vídeo selecionado',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withAlpha(7),
               fontSize: 14,
             ),
           ),
@@ -232,7 +232,7 @@ class _EditorViewState extends State<EditorView> {
             child: CircularProgressIndicator(
               strokeWidth: 6,
               value: _processProgress,
-              backgroundColor: Colors.white.withOpacity(0.1),
+              backgroundColor: Colors.white.withAlpha(1),
               valueColor: const AlwaysStoppedAnimation<Color>(
                 Color(0xFF6366F1),
               ),
@@ -251,7 +251,7 @@ class _EditorViewState extends State<EditorView> {
           Text(
             '${(_processProgress * 100).toInt()}% concluído',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withAlpha(7),
               fontSize: 16,
             ),
           ),
@@ -260,7 +260,7 @@ class _EditorViewState extends State<EditorView> {
             'Aplicando jump cuts e melhorias de áudio...',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withAlpha(5),
               fontSize: 14,
             ),
           ),
@@ -290,7 +290,7 @@ class _EditorViewState extends State<EditorView> {
             color: const Color(0xFF2A2A2A),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withAlpha(1),
               width: 1,
             ),
           ),
@@ -300,7 +300,7 @@ class _EditorViewState extends State<EditorView> {
                 children: [
                   Icon(
                     Icons.content_cut,
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withAlpha(7),
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -332,7 +332,7 @@ class _EditorViewState extends State<EditorView> {
                     Text(
                       'Sensibilidade: ${_jumpCutThreshold.toStringAsFixed(1)}s',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withAlpha(7),
                         fontSize: 14,
                       ),
                     ),
@@ -344,7 +344,7 @@ class _EditorViewState extends State<EditorView> {
                   max: 3.0,
                   divisions: 5,
                   activeColor: const Color(0xFF6366F1),
-                  inactiveColor: Colors.white.withOpacity(0.2),
+                  inactiveColor: Colors.white.withAlpha(2),
                   onChanged: (value) {
                     setState(() {
                       _jumpCutThreshold = value;
@@ -364,7 +364,7 @@ class _EditorViewState extends State<EditorView> {
             color: const Color(0xFF2A2A2A),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withAlpha(1),
               width: 1,
             ),
           ),
@@ -372,7 +372,7 @@ class _EditorViewState extends State<EditorView> {
             children: [
               Icon(
                 Icons.graphic_eq,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withAlpha(7),
                 size: 20,
               ),
               const SizedBox(width: 12),
