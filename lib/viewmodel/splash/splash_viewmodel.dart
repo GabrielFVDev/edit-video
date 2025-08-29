@@ -1,38 +1,93 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:video_editor/states/states.dart';
+import 'package:flutter/material.dart';
+import 'package:video_editor/bloc/blocs.dart';
 
-// Splash ViewModel
-class SplashViewModel extends StateNotifier<SplashState> {
-  SplashViewModel() : super(const SplashState());
+/// ViewModel da tela Splash - usa BLoC como fonte de dados
+class SplashViewModel extends ChangeNotifier {
+  final SplashBloc _splashBloc;
 
-  // Inicializa o app
-  Future<void> initializeApp() async {
-    try {
-      // Simula carregamento de inicializações
-      await Future.delayed(const Duration(milliseconds: 2000));
-
-      // TODO: Verificar se usuário está logado no banco
-      // TODO: Carregar configurações do app
-      // TODO: Verificar permissões necessárias
-
-      // Por enquanto, sempre vai para login
-      state = state.copyWith(status: SplashStatus.unauthenticated);
-    } catch (e) {
-      state = state.copyWith(
-        status: SplashStatus.error,
-        error: 'Erro ao inicializar app: ${e.toString()}',
-      );
-    }
+  SplashViewModel(this._splashBloc) {
+    // Escutar mudanças de estado do BLoC
+    _splashBloc.stream.listen((state) {
+      notifyListeners();
+    });
   }
 
-  // Reset do estado
-  void reset() {
-    state = const SplashState();
+  // Getters que expõem o estado do BLoC
+  SplashState get currentState => _splashBloc.state;
+
+  bool get isInitial => currentState is SplashInitial;
+  bool get isLoading => currentState is SplashLoading;
+  bool get isComplete => currentState is SplashComplete;
+  bool get hasError => currentState is SplashError;
+
+  double get progress {
+    final state = currentState;
+    if (state is SplashLoading) {
+      return state.progress;
+    }
+    return 0.0;
+  }
+
+  String? get message {
+    final state = currentState;
+    if (state is SplashLoading) {
+      return state.message;
+    }
+    return null;
+  }
+
+  String? get errorMessage {
+    final state = currentState;
+    if (state is SplashError) {
+      return state.message;
+    }
+    return null;
+  }
+
+  bool get userLoggedIn {
+    final state = currentState;
+    if (state is SplashComplete) {
+      return state.userLoggedIn;
+    }
+    return false;
+  }
+
+  String? get nextRoute {
+    final state = currentState;
+    if (state is SplashComplete) {
+      return state.nextRoute;
+    }
+    return null;
+  }
+
+  // Métodos que disparam eventos no BLoC
+  void initializeApp() {
+    _splashBloc.add(const InitializeApp());
+  }
+
+  void checkUserLoginStatus() {
+    _splashBloc.add(const CheckUserLoginStatus());
+  }
+
+  void loadAppSettings() {
+    _splashBloc.add(const LoadAppSettings());
+  }
+
+  void updateProgress(double progress, {String? message}) {
+    _splashBloc.add(UpdateProgress(progress, message: message));
+  }
+
+  void navigateToNextScreen() {
+    _splashBloc.add(const NavigateToNextScreen());
+  }
+
+  void restartSplash() {
+    _splashBloc.add(const RestartSplash());
+  }
+
+  @override
+  void dispose() {
+    // O BLoC é gerenciado pelo Provider no main.dart
+    super.dispose();
   }
 }
-
-// Provider do SplashViewModel
-final splashViewModelProvider =
-    StateNotifierProvider<SplashViewModel, SplashState>(
-      (ref) => SplashViewModel(),
-    );

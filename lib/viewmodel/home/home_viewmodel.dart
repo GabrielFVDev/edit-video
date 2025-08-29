@@ -1,132 +1,78 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:video_editor/states/states.dart';
-import '../../model/models.dart';
+import 'package:flutter/material.dart';
+import 'package:video_editor/bloc/blocs.dart';
+import 'package:video_editor/model/video/video_model.dart';
 
-class HomeViewModel extends StateNotifier<HomeState> {
-  HomeViewModel() : super(const HomeState());
+/// ViewModel da tela Home - usa BLoC como fonte de dados
+class HomeViewModel extends ChangeNotifier {
+  final HomeBloc _homeBloc;
 
-  // Carrega vídeos do usuário
-  Future<void> loadVideos() async {
-    state = state.copyWith(isLoading: true, error: null);
+  HomeViewModel(this._homeBloc) {
+    // Escutar mudanças de estado do BLoC
+    _homeBloc.stream.listen((state) {
+      notifyListeners();
+    });
+  }
 
-    try {
-      // TODO: Buscar vídeos do banco SQLite
-      // Por enquanto, dados mockados
-      await Future.delayed(const Duration(seconds: 1));
+  // Getters que expõem o estado do BLoC
+  HomeState get currentState => _homeBloc.state;
 
-      final mockVideos = [
-        VideoModel(
-          id: '1',
-          title: 'Meu primeiro vídeo',
-          description: 'Teste de edição',
-          originalPath: '/path/to/video1.mp4',
-          status: VideoStatus.completed,
-          createdAt: DateTime.now().subtract(const Duration(hours: 2)),
-          durationInSeconds: 165, // 2:45
-          fileSizeInBytes: 15943680, // ~15.2 MB
-          userId: 'user1',
-          processedAt: DateTime.now().subtract(const Duration(hours: 1)),
-        ),
-        VideoModel(
-          id: '2',
-          title: 'Apresentação do projeto',
-          description: 'Vídeo para apresentar o MVP',
-          originalPath: '/path/to/video2.mp4',
-          status: VideoStatus.processing,
-          createdAt: DateTime.now().subtract(const Duration(days: 1)),
-          durationInSeconds: 332, // 5:32
-          fileSizeInBytes: 44195635, // ~42.1 MB
-          userId: 'user1',
-        ),
-        VideoModel(
-          id: '3',
-          title: 'Tutorial de Flutter',
-          description: 'Explicando conceitos básicos',
-          originalPath: '/path/to/video3.mp4',
-          status: VideoStatus.failed,
-          createdAt: DateTime.now().subtract(const Duration(days: 3)),
-          durationInSeconds: 738, // 12:18
-          fileSizeInBytes: 164378214, // ~156.7 MB
-          userId: 'user1',
-        ),
-      ];
+  bool get isLoading => currentState is HomeLoading;
+  bool get isEmpty => currentState is HomeEmpty;
+  bool get hasError => currentState is HomeError;
+  bool get isLoaded => currentState is HomeLoaded;
 
-      state = state.copyWith(
-        videos: mockVideos,
-        isLoading: false,
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Erro ao carregar vídeos: ${e.toString()}',
-      );
+  List<VideoModel> get videos {
+    final state = currentState;
+    if (state is HomeLoaded) {
+      return state.videos;
     }
+    return [];
   }
 
-  // Deleta um vídeo
-  Future<void> deleteVideo(String videoId) async {
-    try {
-      // TODO: Deletar do banco e arquivos
-      final updatedVideos = state.videos.where((v) => v.id != videoId).toList();
-      state = state.copyWith(videos: updatedVideos);
-    } catch (e) {
-      state = state.copyWith(
-        error: 'Erro ao deletar vídeo: ${e.toString()}',
-      );
+  String? get errorMessage {
+    final state = currentState;
+    if (state is HomeError) {
+      return state.message;
     }
+    return null;
   }
 
-  // Atualiza status de um vídeo específico
-  void updateVideoStatus(String videoId, VideoStatus status) {
-    final updatedVideos = state.videos.map((video) {
-      if (video.id == videoId) {
-        return video.copyWith(
-          status: status,
-          processedAt: status == VideoStatus.completed ? DateTime.now() : null,
-        );
-      }
-      return video;
-    }).toList();
-
-    state = state.copyWith(videos: updatedVideos);
+  bool get isRefreshing {
+    final state = currentState;
+    if (state is HomeLoaded) {
+      return state.isRefreshing;
+    }
+    return false;
   }
 
-  // Adiciona novo vídeo
+  // Métodos que disparam eventos no BLoC
+  void loadVideos() {
+    _homeBloc.add(const LoadVideos());
+  }
+
+  void refreshVideos() {
+    _homeBloc.add(const RefreshVideos());
+  }
+
   void addVideo(VideoModel video) {
-    final updatedVideos = [video, ...state.videos];
-    state = state.copyWith(videos: updatedVideos);
+    _homeBloc.add(AddVideo(video));
   }
 
-  // Limpar erros
+  void removeVideo(String videoId) {
+    _homeBloc.add(RemoveVideo(videoId));
+  }
+
+  void simulateError() {
+    _homeBloc.add(const SimulateError());
+  }
+
   void clearError() {
-    state = state.copyWith(error: null);
+    _homeBloc.add(const ClearError());
   }
 
-  // Refresh
-  Future<void> refresh() async {
-    await loadVideos();
+  @override
+  void dispose() {
+    // O BLoC é gerenciado pelo Provider no main.dart
+    super.dispose();
   }
 }
-
-// Provider do HomeViewModel
-final homeViewModelProvider = StateNotifierProvider<HomeViewModel, HomeState>(
-  (ref) => HomeViewModel(),
-);
-
-// Provider para filtrar vídeos por status
-final videosByStatusProvider = Provider.family<List<VideoModel>, VideoStatus>((
-  ref,
-  status,
-) {
-  final homeState = ref.watch(homeViewModelProvider);
-  return homeState.videos.where((video) => video.status == status).toList();
-});
-
-// Provider para contar vídeos por status
-final videoCountByStatusProvider = Provider.family<int, VideoStatus>((
-  ref,
-  status,
-) {
-  final videos = ref.watch(videosByStatusProvider(status));
-  return videos.length;
-});

@@ -1,119 +1,94 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../model/models.dart';
-import '../../states/states.dart';
+import 'package:flutter/material.dart';
+import 'package:video_editor/bloc/blocs.dart';
+import 'package:video_editor/model/user/user_model.dart';
 
-// Estados do Auth
+/// ViewModel da tela Login - usa BLoC como fonte de dados
+class LoginViewModel extends ChangeNotifier {
+  final LoginBloc _loginBloc;
 
-// Auth ViewModel
-class LoginViewModel extends StateNotifier<AuthState> {
-  LoginViewModel()
-    : super(
-        const AuthState(),
-      );
-
-  Future handleLogin(String name, String email) async {
-    await login(name, email);
+  LoginViewModel(this._loginBloc) {
+    // Escutar mudanças de estado do BLoC
+    _loginBloc.stream.listen((state) {
+      notifyListeners();
+    });
   }
 
-  // Simula login (futuramente conectará com banco/API)
-  Future<bool> login(String name, String email) async {
-    state = state.copyWith(isLoading: true, error: null);
+  // Getters que expõem o estado do BLoC
+  LoginState get currentState => _loginBloc.state;
 
-    try {
-      // Simula delay de autenticação
-      await Future.delayed(const Duration(seconds: 2));
+  bool get isLoading => currentState is LoginLoading;
+  bool get hasError => currentState is LoginError;
+  bool get isSuccess => currentState is LoginSuccess;
+  bool get isValidation => currentState is LoginValidation;
 
-      // Validações básicas
-      if (name.trim().length < 2) {
-        state = state.copyWith(
-          isLoading: false,
-          error: 'Nome deve ter pelo menos 2 caracteres',
-        );
-        return false;
-      }
-
-      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email.trim())) {
-        state = state.copyWith(
-          isLoading: false,
-          error: 'Email inválido',
-        );
-        return false;
-      }
-
-      // Cria usuário
-      final user = UserModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        name: name.trim(),
-        email: email.trim().toLowerCase(),
-        createdAt: DateTime.now(),
-        lastLoginAt: DateTime.now(),
-      );
-
-      // TODO: Salvar no banco local (SQLite)
-
-      state = state.copyWith(
-        user: user,
-        isLoading: false,
-        isAuthenticated: true,
-        error: null,
-      );
-
-      return true;
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Erro ao fazer login: ${e.toString()}',
-      );
-      return false;
+  String? get errorMessage {
+    final state = currentState;
+    if (state is LoginError) {
+      return state.message;
     }
+    return null;
   }
 
-  // Logout
-  void logout() {
-    // TODO: Limpar dados do banco
-    state = const AuthState();
-  }
-
-  // Verificar se usuário já está logado (para splash)
-  Future<void> checkAuthStatus() async {
-    state = state.copyWith(isLoading: true);
-
-    try {
-      // TODO: Verificar no banco se há usuário salvo
-      await Future.delayed(const Duration(seconds: 1));
-
-      // Por enquanto, sempre não autenticado
-      state = state.copyWith(
-        isLoading: false,
-        isAuthenticated: false,
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Erro ao verificar autenticação',
-      );
+  UserModel? get user {
+    final state = currentState;
+    if (state is LoginSuccess) {
+      return state.user;
     }
+    return null;
   }
 
-  // Limpar erros
+  bool get isEmailValid {
+    final state = currentState;
+    if (state is LoginValidation) {
+      return state.isEmailValid;
+    }
+    return true; // Assume válido por padrão
+  }
+
+  bool get isNameValid {
+    final state = currentState;
+    if (state is LoginValidation) {
+      return state.isNameValid;
+    }
+    return true; // Assume válido por padrão
+  }
+
+  bool get isFormValid {
+    final state = currentState;
+    if (state is LoginValidation) {
+      return state.isFormValid;
+    }
+    return false;
+  }
+
+  // Métodos que disparam eventos no BLoC
+  void performLogin(String email, String name) {
+    _loginBloc.add(PerformLogin(email, name));
+  }
+
+  void validateEmail(String email) {
+    _loginBloc.add(ValidateEmail(email));
+  }
+
+  void validateName(String name) {
+    _loginBloc.add(ValidateName(name));
+  }
+
+  void validateForm(String email, String name) {
+    _loginBloc.add(ValidateForm(email, name));
+  }
+
   void clearError() {
-    state = state.copyWith(error: null);
+    _loginBloc.add(const ClearLoginError());
+  }
+
+  void logout() {
+    _loginBloc.add(const Logout());
+  }
+
+  @override
+  void dispose() {
+    // O BLoC é gerenciado pelo Provider no main.dart
+    super.dispose();
   }
 }
-
-// Provider do LoginViewModel
-final loginViewModelProvider = StateNotifierProvider<LoginViewModel, AuthState>(
-  (ref) => LoginViewModel(),
-);
-
-// Provider para verificar se está autenticado (helper)
-final isAuthenticatedProvider = Provider<bool>((ref) {
-  final authState = ref.watch(loginViewModelProvider);
-  return authState.isAuthenticated;
-});
-
-// Provider para o usuário atual (helper)
-final currentUserProvider = Provider<UserModel?>((ref) {
-  final authState = ref.watch(loginViewModelProvider);
-  return authState.user;
-});

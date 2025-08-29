@@ -1,31 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:video_editor/core/config/routes.dart';
 import 'package:video_editor/core/constants/app_colors.dart';
 import 'package:video_editor/bloc/blocs.dart';
+import 'package:video_editor/viewmodel/home/home_viewmodel.dart';
+import 'package:video_editor/viewmodel/login/login_viewmodel.dart';
+import 'package:video_editor/viewmodel/splash/splash_viewmodel.dart';
+import 'package:video_editor/viewmodel/editor/editor_viewmodel.dart';
 
 void main() {
   runApp(
     MultiBlocProvider(
       providers: [
-        // BlocProvider para BLoC da tela Home
-        BlocProvider(
-          create: (_) => HomeBloc(),
-        ),
-        // BlocProvider para BLoC da tela Login
-        BlocProvider(
-          create: (_) => LoginBloc(),
-        ),
-        // BlocProvider para BLoC da tela Splash
-        BlocProvider(
-          create: (_) => SplashBloc(),
-        ),
-        // BlocProvider para BLoC da tela Editor
-        BlocProvider(
-          create: (_) => EditorBloc(),
-        ),
+        // BlocProviders para BLoCs
+        BlocProvider(create: (_) => HomeBloc()),
+        BlocProvider(create: (_) => LoginBloc()),
+        BlocProvider(create: (_) => SplashBloc()),
+        BlocProvider(create: (_) => EditorBloc()),
       ],
-      child: const MyApp(),
+      child: MultiProvider(
+        providers: [
+          // ChangeNotifierProviders para ViewModels
+          ChangeNotifierProvider(
+            create: (context) => HomeViewModel(context.read<HomeBloc>()),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => LoginViewModel(context.read<LoginBloc>()),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => SplashViewModel(context.read<SplashBloc>()),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => EditorViewModel(context.read<EditorBloc>()),
+          ),
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 }
