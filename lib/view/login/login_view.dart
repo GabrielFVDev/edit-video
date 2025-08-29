@@ -5,7 +5,6 @@ import 'package:video_editor/states/states.dart';
 import 'package:video_editor/viewmodel/login/login_viewmodel.dart';
 
 import '../widgets/buttons/primary_button.dart';
-import '../widgets/loading/custom_loading.dart';
 
 class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
@@ -195,18 +194,6 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 ),
                 const SizedBox(height: 32),
 
-                // ✅ ESPECIALISTA: PrimaryButton integrado com estado
-                PrimaryButton(
-                  label: 'Entrar',
-                  state: authState.isLoading
-                      ? ButtonState.loading
-                      : ButtonState.normal,
-                  loadingType: LoadingType.circular,
-                  onPressed: authState.isLoading ? null : _handleLogin,
-                ),
-
-                const SizedBox(height: 24),
-
                 // Texto informativo
                 Text(
                   'Este é um MVP. Os dados são salvos localmente.',
@@ -219,6 +206,16 @@ class _LoginViewState extends ConsumerState<LoginView> {
               ],
             ),
           ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 24.0),
+        child: PrimaryButton.bigRounded(
+          label: 'Entrar',
+          state: authState.isLoading
+              ? StateButton.loading
+              : StateButton.success,
+          onPressed: _handleLogin,
         ),
       ),
     );

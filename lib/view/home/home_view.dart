@@ -10,41 +10,14 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   // Mock data - será substituído por dados reais do banco
-  final List<Map<String, dynamic>> _videos = [
-    {
-      'id': '1',
-      'title': 'Meu primeiro vídeo',
-      'duration': '02:45',
-      'status': 'completed',
-      'thumbnail': null,
-      'createdAt': '2 horas atrás',
-      'fileSize': '15.2 MB',
-    },
-    {
-      'id': '2',
-      'title': 'Apresentação do projeto',
-      'duration': '05:32',
-      'status': 'processing',
-      'thumbnail': null,
-      'createdAt': '1 dia atrás',
-      'fileSize': '42.1 MB',
-    },
-    {
-      'id': '3',
-      'title': 'Tutorial de Flutter',
-      'duration': '12:18',
-      'status': 'failed',
-      'thumbnail': null,
-      'createdAt': '3 dias atrás',
-      'fileSize': '156.7 MB',
-    },
-  ];
+  final List<Map<String, dynamic>> _videos = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A1A),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFF1A1A1A),
         elevation: 0,
         title: const Text(
@@ -95,7 +68,7 @@ class _HomeViewState extends State<HomeView> {
             child: Icon(
               Icons.video_library_outlined,
               size: 60,
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withAlpha(5),
             ),
           ),
           const SizedBox(height: 24),
@@ -112,7 +85,7 @@ class _HomeViewState extends State<HomeView> {
             'Comece criando seu primeiro vídeo editado',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withAlpha(7),
             ),
           ),
           const SizedBox(height: 32),
