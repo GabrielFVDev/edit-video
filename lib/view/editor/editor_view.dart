@@ -22,33 +22,147 @@ class _EditorViewState extends State<EditorView> {
     super.dispose();
   }
 
-  void _initializeVideoPlayer(String videoPath) {
-    _videoController?.dispose();
-    _videoController = VideoPlayerController.file(File(videoPath))
-      ..initialize()
-          .then((_) {
-            if (mounted) {
-              setState(() {});
-            }
-          })
-          .catchError((error) {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Erro ao carregar vídeo: $error'),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          });
+  void _initializeVideoPlayer(String videoPath) async {
+    print('DEBUG: Inicializando player para: $videoPath');
+
+    // Garantir que o controller anterior seja completamente liberado
+    if (_videoController != null) {
+      print('DEBUG: Liberando controller anterior');
+      await _videoController!.dispose();
+      _videoController = null;
+      if (mounted) {
+        setState(() {});
+      }
+      // Aguardar um pequeno delay para garantir limpeza completa
+      await Future.delayed(const Duration(milliseconds: 50));
+    }
+
+    try {
+      _videoController = VideoPlayerController.file(File(videoPath));
+      await _videoController!.initialize();
+
+      print('DEBUG: Vídeo inicializado com sucesso');
+      if (mounted) {
+        setState(() {});
+      }
+    } catch (error) {
+      print('DEBUG: Erro ao inicializar vídeo: $error');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao carregar vídeo: $error'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _showSuccessDialog(
+    BuildContext context,
+    EditorProcessingComplete state,
+  ) {
+    print('DEBUG: _showSuccessDialog chamado!');
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF2A2A2A),
+        title: const Text(
+          'Processamento Concluído!',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.check_circle,
+              color: Colors.green,
+              size: 48,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Seu vídeo foi processado com sucesso!\n\n'
+              'Arquivo original: ${state.originalVideoPath.split('/').last}\n'
+              'Arquivo processado: ${state.processedVideoPath.split('/').last}',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white.withOpacity(0.7)),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Redirecionando para home em 3 segundos...',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.5),
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              // TODO: Adicionar vídeo à HomeBloc
+              // context.read<HomeBloc>().add(AddVideo(state.processedVideoModel));
+              context.go('/home');
+            },
+            child: const Text(
+              'Ir para Home Agora',
+              style: TextStyle(color: Color(0xFF6366F1)),
+            ),
+          ),
+        ],
+      ),
+    ).then((_) {
+      // Navegar para home automaticamente após 3 segundos
+      Future.delayed(const Duration(seconds: 3), () {
+        if (context.mounted) {
+          context.go('/home');
+        }
+      });
+    });
+
+    // Timer automático para fechar o dialog e navegar
+    Future.delayed(const Duration(seconds: 3), () {
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        context.go('/home');
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<EditorBloc, EditorState>(
-      listener: (context, state) {
+      listener: (context, state) async {
+        print('DEBUG: Estado mudou para: ${state.runtimeType}');
         if (state is EditorVideoLoaded) {
+          print('DEBUG: Carregando vídeo: ${state.videoPath}');
           _initializeVideoPlayer(state.videoPath);
+        } else if (state is EditorProcessingComplete) {
+          // Primeiro resetar o controller
+          print('DEBUG: Resetando controller após processamento');
+          if (_videoController != null) {
+            await _videoController!.dispose();
+            _videoController = null;
+            if (mounted) {
+              setState(() {});
+            }
+          }
+          // Depois mostrar o dialog de sucesso
+          print('DEBUG: Mostrando dialog de sucesso');
+          _showSuccessDialog(context, state);
+        } else if (state is EditorInitial || state is EditorVideoSelecting) {
+          // Resetar o controller quando volta ao estado inicial ou está selecionando
+          print('DEBUG: Resetando controller');
+          if (_videoController != null) {
+            await _videoController!.dispose();
+            _videoController = null;
+            if (mounted) {
+              setState(() {});
+            }
+          }
         } else if (state is EditorError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -103,7 +217,9 @@ class _EditorViewState extends State<EditorView> {
   }
 
   Widget _buildBody(EditorState state) {
-    if (state is EditorInitial || state is EditorVideoSelecting) {
+    if (state is EditorInitial ||
+        state is EditorVideoSelecting ||
+        state is EditorProcessingComplete) {
       return EditorInitialWidget(state: state);
     } else if (state is EditorVideoLoaded || state is EditorProcessing) {
       return EditorVideoLoadedWidget(
@@ -149,7 +265,7 @@ class EditorInitialWidget extends StatelessWidget {
                     ? Icons.hourglass_empty
                     : Icons.video_call_outlined,
                 size: 60,
-                color: Colors.white.withAlpha(7),
+                color: Colors.white,
               ),
             ),
             const SizedBox(height: 32),

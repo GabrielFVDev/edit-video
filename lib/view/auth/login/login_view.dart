@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:video_editor/viewmodel/viewmodels.dart';
 import 'package:video_editor/core/constants/app_colors.dart';
-import '../widgets/buttons/primary_button.dart';
+import '../../widgets/buttons/primary_button.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -189,16 +189,6 @@ class _LoginViewState extends State<LoginView> {
                     ),
                     const SizedBox(height: 32),
 
-                    // Botão de Login
-                    PrimaryButton.bigRounded(
-                      label: 'Entrar',
-                      onPressed: _handleLogin,
-                      state: loginViewModel.isLoading
-                          ? StateButton.loading
-                          : StateButton.success,
-                    ),
-                    const SizedBox(height: 24),
-
                     // Texto informativo
                     Text(
                       'Este é um MVP. Os dados são salvos localmente.',
@@ -211,6 +201,16 @@ class _LoginViewState extends State<LoginView> {
                   ],
                 ),
               ),
+            ),
+          ),
+          bottomNavigationBar: Padding(
+            padding: const EdgeInsets.only(left: 24, right: 24, bottom: 42),
+            child: PrimaryButton.bigRounded(
+              label: 'Entrar',
+              onPressed: _handleLogin,
+              state: loginViewModel.isLoading
+                  ? StateButton.loading
+                  : StateButton.success,
             ),
           ),
         );
