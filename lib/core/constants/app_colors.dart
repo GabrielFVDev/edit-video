@@ -17,7 +17,7 @@ class AppColors {
   /// Cor do texto secundário (subtítulos, placeholders)
   static const Color foregroundSecondary = Color(
     0xB3FFFFFF,
-  ); // white.withOpacity(0.7)
+  ); // white.withAlpha(7)
 
   /// Cor do texto desabilitado
   static const Color foregroundDisabled = Color(

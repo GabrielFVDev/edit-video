@@ -163,7 +163,7 @@ class StateBuilder<T> extends StatelessWidget {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: AppColors.error.withOpacity(0.1),
+                color: AppColors.error.withAlpha(1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Icon(

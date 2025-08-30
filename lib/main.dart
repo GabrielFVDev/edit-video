@@ -4,10 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:video_editor/core/config/routes.dart';
 import 'package:video_editor/core/constants/app_colors.dart';
 import 'package:video_editor/bloc/blocs.dart';
-import 'package:video_editor/viewmodel/home/home_viewmodel.dart';
-import 'package:video_editor/viewmodel/login/login_viewmodel.dart';
-import 'package:video_editor/viewmodel/splash/splash_viewmodel.dart';
-import 'package:video_editor/viewmodel/editor/editor_viewmodel.dart';
+import 'package:video_editor/viewmodel/viewmodels.dart';
 
 void main() {
   runApp(
@@ -51,7 +48,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routerConfig: router,
       theme: ThemeData(
-        // Configuração de tema escuro para combinar com as telas
         brightness: Brightness.dark,
         primarySwatch: Colors.indigo,
         scaffoldBackgroundColor: AppColors.background,

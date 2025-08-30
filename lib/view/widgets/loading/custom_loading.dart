@@ -173,7 +173,7 @@ class _CustomLoadingState extends State<CustomLoading>
             width: widget.size,
             height: widget.size,
             decoration: BoxDecoration(
-              color: widget.color.withOpacity(0.7),
+              color: widget.color.withAlpha(7),
               shape: BoxShape.circle,
             ),
           ),

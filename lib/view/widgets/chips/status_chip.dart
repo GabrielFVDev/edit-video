@@ -107,10 +107,10 @@ class StatusChip extends StatelessWidget {
         vertical: sizeData.verticalPadding,
       ),
       decoration: BoxDecoration(
-        color: chipData.color.withOpacity(0.2),
+        color: chipData.color.withAlpha(2),
         borderRadius: BorderRadius.circular(sizeData.borderRadius),
         border: Border.all(
-          color: chipData.color.withOpacity(0.3),
+          color: chipData.color.withAlpha(3),
           width: 1,
         ),
       ),

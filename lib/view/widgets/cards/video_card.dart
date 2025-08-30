@@ -90,7 +90,7 @@ class VideoCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: AppColors.foregroundSecondary.withOpacity(0.1),
+          color: AppColors.foregroundSecondary.withAlpha(1),
           width: 1,
         ),
       ),
@@ -122,7 +122,7 @@ class VideoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         color: AppColors.background,
         border: Border.all(
-          color: AppColors.foregroundSecondary.withOpacity(0.2),
+          color: AppColors.foregroundSecondary.withAlpha(2),
           width: 1,
         ),
       ),

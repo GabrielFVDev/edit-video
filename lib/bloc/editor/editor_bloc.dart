@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:video_editor/model/video/video_model.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:path/path.dart' as path;
 import 'editor_state.dart';
 import 'editor_action.dart';
 
@@ -26,13 +28,72 @@ class EditorBloc extends Bloc<EditorEvent, EditorState> {
     emit(const EditorVideoSelecting());
 
     try {
-      // Simular seleção de vídeo
-      await Future.delayed(const Duration(seconds: 1));
+      // Selecionar arquivo de vídeo
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.video,
+        allowMultiple: false,
+      );
 
-      // Mock de vídeo selecionado
-      const videoPath = '/mock/path/selected_video.mp4';
+      if (result != null && result.files.single.path != null) {
+        final filePath = result.files.single.path!;
+        final fileName = path.basename(filePath);
 
-      emit(const EditorVideoLoaded(videoPath: videoPath));
+        // Verificar se o arquivo não é .gif
+        if (fileName.toLowerCase().endsWith('.gif')) {
+          emit(
+            const EditorError(
+              message:
+                  'Arquivos GIF não são suportados. Selecione um vídeo válido.',
+            ),
+          );
+          return;
+        }
+
+        // Verificar formatos suportados
+        final supportedFormats = [
+          '.mp4',
+          '.mov',
+          '.avi',
+          '.mkv',
+          '.wmv',
+          '.flv',
+          '.webm',
+        ];
+        final extension = path.extension(fileName).toLowerCase();
+
+        if (!supportedFormats.contains(extension)) {
+          emit(
+            EditorError(
+              message:
+                  'Formato de arquivo não suportado: $extension\nFormatos aceitos: ${supportedFormats.join(', ')}',
+            ),
+          );
+          return;
+        }
+
+        // Criar modelo básico do vídeo
+        final videoModel = VideoModel(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          title: fileName,
+          description: 'Vídeo selecionado para edição',
+          originalPath: filePath,
+          status: VideoStatus.processing,
+          durationInSeconds: 0, // Será calculado depois
+          fileSizeInBytes: result.files.single.size,
+          userId: 'user1', // Temporário
+          createdAt: DateTime.now(),
+        );
+
+        emit(
+          EditorVideoLoaded(
+            videoPath: filePath,
+            videoModel: videoModel,
+          ),
+        );
+      } else {
+        // Usuário cancelou a seleção
+        emit(const EditorInitial());
+      }
     } catch (e) {
       emit(EditorError(message: 'Erro ao selecionar vídeo: ${e.toString()}'));
     }

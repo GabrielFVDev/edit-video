@@ -111,7 +111,7 @@ class _HomeViewState extends State<HomeView> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.foreground.withOpacity(0.8),
+              color: AppColors.foreground.withAlpha(8),
             ),
           ),
           const SizedBox(height: 8),
@@ -120,7 +120,7 @@ class _HomeViewState extends State<HomeView> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
-              color: AppColors.foreground.withOpacity(0.6),
+              color: AppColors.foreground.withAlpha(6),
             ),
           ),
           const SizedBox(height: 24),
@@ -155,7 +155,7 @@ class _HomeViewState extends State<HomeView> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.foreground.withOpacity(0.8),
+              color: AppColors.foreground.withAlpha(8),
             ),
           ),
           const SizedBox(height: 8),
@@ -164,7 +164,7 @@ class _HomeViewState extends State<HomeView> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
-              color: AppColors.foreground.withOpacity(0.6),
+              color: AppColors.foreground.withAlpha(6),
             ),
           ),
         ],
