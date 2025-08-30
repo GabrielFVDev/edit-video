@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class CadastroView extends StatelessWidget {
-  const CadastroView({super.key});
+class ConfigView extends StatelessWidget {
+  const ConfigView({super.key});
 
   @override
   Widget build(BuildContext context) {

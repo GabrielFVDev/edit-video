@@ -8,25 +8,37 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
-        return const SplashView();
+        return SplashView();
       },
       routes: <RouteBase>[
         GoRoute(
           path: 'home',
           builder: (BuildContext context, GoRouterState state) {
-            return const HomeView();
+            return HomeView();
           },
         ),
         GoRoute(
           path: 'login',
           builder: (BuildContext context, GoRouterState state) {
-            return const LoginView();
+            return LoginView();
           },
         ),
         GoRoute(
           path: 'editor',
           builder: (BuildContext context, GoRouterState state) {
-            return const EditorView();
+            return EditorView();
+          },
+        ),
+        GoRoute(
+          path: 'config',
+          builder: (BuildContext context, GoRouterState state) {
+            return ConfigView();
+          },
+        ),
+        GoRoute(
+          path: 'cadastro',
+          builder: (BuildContext context, GoRouterState state) {
+            return CadastroView();
           },
         ),
       ],
