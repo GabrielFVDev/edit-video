@@ -23,11 +23,8 @@ class _EditorViewState extends State<EditorView> {
   }
 
   void _initializeVideoPlayer(String videoPath) async {
-    print('DEBUG: Inicializando player para: $videoPath');
-
     // Garantir que o controller anterior seja completamente liberado
     if (_videoController != null) {
-      print('DEBUG: Liberando controller anterior');
       await _videoController!.dispose();
       _videoController = null;
       if (mounted) {
@@ -41,12 +38,10 @@ class _EditorViewState extends State<EditorView> {
       _videoController = VideoPlayerController.file(File(videoPath));
       await _videoController!.initialize();
 
-      print('DEBUG: Vídeo inicializado com sucesso');
       if (mounted) {
         setState(() {});
       }
     } catch (error) {
-      print('DEBUG: Erro ao inicializar vídeo: $error');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -62,7 +57,6 @@ class _EditorViewState extends State<EditorView> {
     BuildContext context,
     EditorProcessingComplete state,
   ) {
-    print('DEBUG: _showSuccessDialog chamado!');
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -86,14 +80,14 @@ class _EditorViewState extends State<EditorView> {
               'Arquivo original: ${state.originalVideoPath.split('/').last}\n'
               'Arquivo processado: ${state.processedVideoPath.split('/').last}',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white.withOpacity(0.7)),
+              style: TextStyle(color: Colors.white),
             ),
             const SizedBox(height: 16),
             Text(
               'Redirecionando para home em 3 segundos...',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.5),
+                color: Colors.white.withAlpha(5),
                 fontSize: 12,
               ),
             ),
@@ -103,8 +97,8 @@ class _EditorViewState extends State<EditorView> {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              // TODO: Adicionar vídeo à HomeBloc
-              // context.read<HomeBloc>().add(AddVideo(state.processedVideoModel));
+              // Adicionar vídeo à HomeBloc
+              context.read<HomeBloc>().add(AddVideo(state.processedVideoModel));
               context.go('/home');
             },
             child: const Text(
@@ -127,6 +121,8 @@ class _EditorViewState extends State<EditorView> {
     Future.delayed(const Duration(seconds: 3), () {
       if (context.mounted) {
         Navigator.of(context).pop();
+        // Adicionar vídeo à HomeBloc
+        context.read<HomeBloc>().add(AddVideo(state.processedVideoModel));
         context.go('/home');
       }
     });
@@ -136,13 +132,10 @@ class _EditorViewState extends State<EditorView> {
   Widget build(BuildContext context) {
     return BlocConsumer<EditorBloc, EditorState>(
       listener: (context, state) async {
-        print('DEBUG: Estado mudou para: ${state.runtimeType}');
         if (state is EditorVideoLoaded) {
-          print('DEBUG: Carregando vídeo: ${state.videoPath}');
           _initializeVideoPlayer(state.videoPath);
         } else if (state is EditorProcessingComplete) {
           // Primeiro resetar o controller
-          print('DEBUG: Resetando controller após processamento');
           if (_videoController != null) {
             await _videoController!.dispose();
             _videoController = null;
@@ -151,11 +144,9 @@ class _EditorViewState extends State<EditorView> {
             }
           }
           // Depois mostrar o dialog de sucesso
-          print('DEBUG: Mostrando dialog de sucesso');
           _showSuccessDialog(context, state);
         } else if (state is EditorInitial || state is EditorVideoSelecting) {
           // Resetar o controller quando volta ao estado inicial ou está selecionando
-          print('DEBUG: Resetando controller');
           if (_videoController != null) {
             await _videoController!.dispose();
             _videoController = null;

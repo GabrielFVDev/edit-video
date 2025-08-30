@@ -5,6 +5,9 @@ import 'home_action.dart';
 
 /// BLoC para gerenciar estado da tela Home
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
+  // Lista interna para armazenar vídeos (temporário, será substituída pelo SQLite)
+  final List<VideoModel> _videos = [];
+
   HomeBloc() : super(const HomeInitial()) {
     // Registrar handlers para cada evento
     on<LoadVideos>(_onLoadVideos);
@@ -21,15 +24,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     try {
       // Simular carregamento
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(milliseconds: 500));
 
-      // Simular lista de vídeos (substitua pela lógica real)
-      final videos = _getMockVideos();
-
-      if (videos.isEmpty) {
+      // Usar lista real de vídeos
+      if (_videos.isEmpty) {
         emit(const HomeEmpty());
       } else {
-        emit(HomeLoaded(videos: videos));
+        emit(HomeLoaded(videos: List.from(_videos)));
       }
     } catch (e) {
       emit(HomeError(message: 'Erro ao carregar vídeos: ${e.toString()}'));
@@ -49,13 +50,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
 
     try {
-      await Future.delayed(const Duration(seconds: 1));
-      final videos = _getMockVideos();
+      await Future.delayed(const Duration(milliseconds: 500));
 
-      if (videos.isEmpty) {
+      if (_videos.isEmpty) {
         emit(const HomeEmpty());
       } else {
-        emit(HomeLoaded(videos: videos));
+        emit(HomeLoaded(videos: List.from(_videos)));
       }
     } catch (e) {
       emit(HomeError(message: 'Erro ao atualizar vídeos: ${e.toString()}'));
@@ -64,28 +64,23 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   /// Handler para adicionar vídeo
   void _onAddVideo(AddVideo event, Emitter<HomeState> emit) {
-    final currentState = state;
-    if (currentState is HomeLoaded) {
-      final updatedVideos = [...currentState.videos, event.video];
-      emit(currentState.copyWith(videos: updatedVideos));
-    } else if (currentState is HomeEmpty) {
-      emit(HomeLoaded(videos: [event.video]));
-    }
+    // Adicionar à lista interna
+    _videos.add(event.video);
+
+    // Emitir novo estado
+    emit(HomeLoaded(videos: List.from(_videos)));
   }
 
   /// Handler para remover vídeo
   void _onRemoveVideo(RemoveVideo event, Emitter<HomeState> emit) {
-    final currentState = state;
-    if (currentState is HomeLoaded) {
-      final updatedVideos = currentState.videos
-          .where((video) => video.id != event.videoId)
-          .toList();
+    // Remover da lista interna
+    _videos.removeWhere((video) => video.id == event.videoId);
 
-      if (updatedVideos.isEmpty) {
-        emit(const HomeEmpty());
-      } else {
-        emit(currentState.copyWith(videos: updatedVideos));
-      }
+    // Emitir novo estado
+    if (_videos.isEmpty) {
+      emit(const HomeEmpty());
+    } else {
+      emit(HomeLoaded(videos: List.from(_videos)));
     }
   }
 
@@ -116,35 +111,5 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         emit(const HomeEmpty());
       }
     }
-  }
-
-  /// Mock de vídeos para teste
-  List<VideoModel> _getMockVideos() {
-    return [
-      VideoModel(
-        id: '1',
-        title: 'Vídeo Exemplo 1',
-        description: 'Descrição do vídeo exemplo 1',
-        originalPath: '/path/video1.mp4',
-        thumbnailPath: '/path/thumb1.jpg',
-        status: VideoStatus.completed,
-        durationInSeconds: 150, // 2 min 30 sec
-        fileSizeInBytes: 1024000,
-        userId: 'user1',
-        createdAt: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-      VideoModel(
-        id: '2',
-        title: 'Vídeo Exemplo 2',
-        description: 'Descrição do vídeo exemplo 2',
-        originalPath: '/path/video2.mp4',
-        thumbnailPath: '/path/thumb2.jpg',
-        status: VideoStatus.completed,
-        durationInSeconds: 345, // 5 min 45 sec
-        fileSizeInBytes: 2048000,
-        userId: 'user1',
-        createdAt: DateTime.now().subtract(const Duration(days: 2)),
-      ),
-    ];
   }
 }
