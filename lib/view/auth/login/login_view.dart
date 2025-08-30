@@ -198,6 +198,30 @@ class _LoginViewState extends State<LoginView> {
                         color: AppColors.foreground,
                       ),
                     ),
+                    const SizedBox(height: 16),
+
+                    // Link para cadastro
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Não tem uma conta? ',
+                          style: TextStyle(
+                            color: AppColors.foregroundSecondary,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => context.go('/cadastro'),
+                          child: Text(
+                            'Criar conta',
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

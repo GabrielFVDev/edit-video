@@ -26,6 +26,9 @@ void main() {
             create: (context) => LoginViewModel(context.read<LoginBloc>()),
           ),
           ChangeNotifierProvider(
+            create: (context) => CadastroViewModel(context.read<LoginBloc>()),
+          ),
+          ChangeNotifierProvider(
             create: (context) => SplashViewModel(context.read<SplashBloc>()),
           ),
           ChangeNotifierProvider(
