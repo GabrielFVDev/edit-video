@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:video_editor/bloc/blocs.dart';
 import 'package:video_editor/model/user/user_model.dart';
-import 'package:video_editor/core/services/first_access_service.dart';
 
 /// ViewModel da tela Cadastro - usa BLoC como fonte de dados
 class CadastroViewModel extends ChangeNotifier {
@@ -65,10 +64,6 @@ class CadastroViewModel extends ChangeNotifier {
   // Métodos que disparam eventos no BLoC - mesmo comportamento do login
   Future<void> performCadastro(String email, String name) async {
     _loginBloc.add(PerformLogin(email, name)); // Reutiliza mesma lógica
-
-    // Marcar que usuário se registrou e primeiro acesso foi completado
-    await FirstAccessService.markUserRegistered();
-    await FirstAccessService.markFirstAccessCompleted();
   }
 
   void validateEmail(String email) {

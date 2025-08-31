@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:video_editor/viewmodel/viewmodels.dart';
 import 'package:video_editor/core/constants/app_colors.dart';
-import 'package:video_editor/core/services/first_access_service.dart';
 import '../../widgets/buttons/primary_button.dart';
 
 class CadastroView extends StatefulWidget {
@@ -18,20 +17,6 @@ class _CadastroViewState extends State<CadastroView> {
   final _emailController = TextEditingController();
   final _nameController = TextEditingController();
   final _confirmEmailController = TextEditingController();
-  bool _isFirstAccess = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkFirstAccess();
-  }
-
-  Future<void> _checkFirstAccess() async {
-    final isFirst = await FirstAccessService.isFirstAccess();
-    setState(() {
-      _isFirstAccess = isFirst;
-    });
-  }
 
   @override
   void dispose() {
@@ -77,6 +62,9 @@ class _CadastroViewState extends State<CadastroView> {
               ),
             );
 
+            // Resetar estado do BLoC (remove LoginSuccess) antes de navegar
+            cadastroViewModel.clearError();
+
             // Navegar para login após delay
             Future.delayed(const Duration(seconds: 2), () {
               if (context.mounted) {
@@ -97,9 +85,7 @@ class _CadastroViewState extends State<CadastroView> {
                 action: SnackBarAction(
                   label: 'Fechar',
                   textColor: Colors.white,
-                  onPressed: () {
-                    cadastroViewModel.clearError();
-                  },
+                  onPressed: () => cadastroViewModel.clearError(),
                 ),
               ),
             );
@@ -108,19 +94,7 @@ class _CadastroViewState extends State<CadastroView> {
 
         return Scaffold(
           backgroundColor: AppColors.background,
-          appBar: _isFirstAccess
-              ? null
-              : AppBar(
-                  backgroundColor: AppColors.background,
-                  elevation: 0,
-                  leading: IconButton(
-                    icon: Icon(
-                      Icons.arrow_back_ios,
-                      color: AppColors.foreground,
-                    ),
-                    onPressed: () => context.pop(),
-                  ),
-                ),
+
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(24.0),
@@ -157,9 +131,7 @@ class _CadastroViewState extends State<CadastroView> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          _isFirstAccess
-                              ? 'Vamos começar criando sua conta'
-                              : 'Preencha os dados para se cadastrar',
+                          'Preencha os dados para se cadastrar',
                           style: TextStyle(
                             fontSize: 16,
                             color: AppColors.foregroundSecondary,
@@ -283,31 +255,27 @@ class _CadastroViewState extends State<CadastroView> {
                       ),
                     ),
 
-                    // Link para login (só se não for primeiro acesso)
-                    if (!_isFirstAccess) ...[
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Já tem uma conta? ',
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Já tem uma conta? ',
+                          style: TextStyle(
+                            color: AppColors.foregroundSecondary,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => context.go('/login'),
+                          child: Text(
+                            'Fazer login',
                             style: TextStyle(
-                              color: AppColors.foregroundSecondary,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () => context.go('/login'),
-                            child: Text(
-                              'Fazer login',
-                              style: TextStyle(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

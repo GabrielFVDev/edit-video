@@ -13,7 +13,6 @@ void main() {
         // BlocProviders para BLoCs
         BlocProvider(create: (_) => HomeBloc()),
         BlocProvider(create: (_) => LoginBloc()),
-        BlocProvider(create: (_) => SplashBloc()),
         BlocProvider(create: (_) => EditorBloc()),
       ],
       child: MultiProvider(
@@ -27,9 +26,6 @@ void main() {
           ),
           ChangeNotifierProvider(
             create: (context) => CadastroViewModel(context.read<LoginBloc>()),
-          ),
-          ChangeNotifierProvider(
-            create: (context) => SplashViewModel(context.read<SplashBloc>()),
           ),
           ChangeNotifierProvider(
             create: (context) => EditorViewModel(context.read<EditorBloc>()),
