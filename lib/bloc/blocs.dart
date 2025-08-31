@@ -4,9 +4,14 @@ export 'home/home_state.dart';
 export 'home/home_action.dart';
 
 // Login
-export 'login/login_bloc.dart';
-export 'login/login_state.dart';
-export 'login/login_action.dart';
+export 'auth/login/login_bloc.dart';
+export 'auth/login/login_state.dart';
+export 'auth/login/login_action.dart';
+
+// Cadastro
+export 'auth/cadastro/cadastro_bloc.dart';
+export 'auth/cadastro/cadastro_state.dart';
+export 'auth/cadastro/cadastro_action.dart';
 
 // Editor
 export 'editor/editor_bloc.dart';

@@ -14,6 +14,7 @@ void main() {
         BlocProvider(create: (_) => HomeBloc()),
         BlocProvider(create: (_) => LoginBloc()),
         BlocProvider(create: (_) => EditorBloc()),
+        BlocProvider(create: (_) => CadastroBloc()),
       ],
       child: MultiProvider(
         providers: [
@@ -25,7 +26,8 @@ void main() {
             create: (context) => LoginViewModel(context.read<LoginBloc>()),
           ),
           ChangeNotifierProvider(
-            create: (context) => CadastroViewModel(context.read<LoginBloc>()),
+            create: (context) =>
+                CadastroViewModel(context.read<CadastroBloc>()),
           ),
           ChangeNotifierProvider(
             create: (context) => EditorViewModel(context.read<EditorBloc>()),

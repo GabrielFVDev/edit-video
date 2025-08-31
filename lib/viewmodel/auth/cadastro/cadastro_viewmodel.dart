@@ -1,69 +1,71 @@
 import 'package:flutter/material.dart';
+import 'package:video_editor/bloc/blocs.dart';
 import 'package:video_editor/model/user/user_model.dart';
 
-/// ViewModel da tela Cadastro - usa estado interno para evitar efeitos colaterais
+/// ViewModel da tela Cadastro - usa o CadastroBloc como fonte de dados
 class CadastroViewModel extends ChangeNotifier {
-  // Mantemos a assinatura compatível (se outro código passar um bloc),
-  // mas não dependemos dele para o fluxo de cadastro.
-  CadastroViewModel([dynamic _maybeLoginBloc]);
+  final CadastroBloc _cadastroBloc;
 
-  bool _isLoading = false;
-  bool _isSuccess = false;
-  bool _hasError = false;
-  String? _errorMessage;
-  UserModel? _user;
+  CadastroViewModel(this._cadastroBloc) {
+    _cadastroBloc.stream.listen((_) => notifyListeners());
+  }
 
-  bool get isLoading => _isLoading;
-  bool get hasError => _hasError;
-  bool get isSuccess => _isSuccess;
-  String? get errorMessage => _errorMessage;
-  UserModel? get user => _user;
+  CadastroState get currentState => _cadastroBloc.state;
 
-  /// Simula criação de conta e marca que o usuário possui conta
-  Future<void> performCadastro(String email, String name) async {
-    if (_isLoading) return;
-    _isLoading = true;
-    _hasError = false;
-    _errorMessage = null;
-    _isSuccess = false;
-    notifyListeners();
+  bool get isLoading => currentState is CadastroLoading;
+  bool get hasError => currentState is CadastroError;
+  bool get isSuccess => currentState is CadastroSuccess;
+  bool get isValidation => currentState is CadastroValidation;
 
-    try {
-      // Simular chamada de rede / criação de conta
-      await Future.delayed(const Duration(seconds: 2));
+  String? get errorMessage {
+    final state = currentState;
+    if (state is CadastroError) return state.message;
+    return null;
+  }
 
-      // Criar usuário mock
-      _user = UserModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        name: name,
-        email: email,
-        createdAt: DateTime.now(),
-        lastLoginAt: DateTime.now(),
-      );
+  UserModel? get user {
+    final state = currentState;
+    if (state is CadastroSuccess) return state.user;
+    return null;
+  }
 
-      _isSuccess = true;
-    } catch (e) {
-      _hasError = true;
-      _errorMessage = 'Erro ao criar conta: ${e.toString()}';
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+  bool get isEmailValid {
+    final state = currentState;
+    if (state is CadastroValidation) return state.isEmailValid;
+    return true;
+  }
+
+  bool get isNameValid {
+    final state = currentState;
+    if (state is CadastroValidation) return state.isNameValid;
+    return true;
+  }
+
+  bool get isFormValid {
+    final state = currentState;
+    if (state is CadastroValidation) return state.isFormValid;
+    return false;
+  }
+
+  // Métodos que disparam eventos no BLoC
+  void performCadastro(String email, String name) {
+    _cadastroBloc.add(PerformCadastro(email, name));
   }
 
   void validateEmail(String email) {
-    // validação local opcional
-    // ...não necessário aqui
+    _cadastroBloc.add(ValidateEmailCadastro(email));
   }
 
-  void validateName(String name) {}
+  void validateName(String name) {
+    _cadastroBloc.add(ValidateNameCadastro(name));
+  }
 
-  void validateForm(String email, String name) {}
+  void validateForm(String email, String name) {
+    _cadastroBloc.add(ValidateFormCadastro(email, name));
+  }
 
   void clearError() {
-    _hasError = false;
-    _errorMessage = null;
-    notifyListeners();
+    _cadastroBloc.add(const ClearCadastroError());
   }
 
   @override
