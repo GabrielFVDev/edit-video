@@ -1,90 +1,73 @@
 import 'package:flutter/material.dart';
-import 'package:video_editor/bloc/blocs.dart';
 import 'package:video_editor/model/user/user_model.dart';
 
-/// ViewModel da tela Cadastro - usa BLoC como fonte de dados
+/// ViewModel da tela Cadastro - usa estado interno para evitar efeitos colaterais
 class CadastroViewModel extends ChangeNotifier {
-  final LoginBloc _loginBloc; // Reutiliza o mesmo BLoC do login
+  // Mantemos a assinatura compatível (se outro código passar um bloc),
+  // mas não dependemos dele para o fluxo de cadastro.
+  CadastroViewModel([dynamic _maybeLoginBloc]);
 
-  CadastroViewModel(this._loginBloc) {
-    // Escutar mudanças de estado do BLoC
-    _loginBloc.stream.listen((state) {
-      notifyListeners();
-    });
-  }
+  bool _isLoading = false;
+  bool _isSuccess = false;
+  bool _hasError = false;
+  String? _errorMessage;
+  UserModel? _user;
 
-  // Getters que expõem o estado do BLoC
-  LoginState get currentState => _loginBloc.state;
+  bool get isLoading => _isLoading;
+  bool get hasError => _hasError;
+  bool get isSuccess => _isSuccess;
+  String? get errorMessage => _errorMessage;
+  UserModel? get user => _user;
 
-  bool get isLoading => currentState is LoginLoading;
-  bool get hasError => currentState is LoginError;
-  bool get isSuccess => currentState is LoginSuccess;
-  bool get isValidation => currentState is LoginValidation;
-
-  String? get errorMessage {
-    final state = currentState;
-    if (state is LoginError) {
-      return state.message;
-    }
-    return null;
-  }
-
-  UserModel? get user {
-    final state = currentState;
-    if (state is LoginSuccess) {
-      return state.user;
-    }
-    return null;
-  }
-
-  bool get isEmailValid {
-    final state = currentState;
-    if (state is LoginValidation) {
-      return state.isEmailValid;
-    }
-    return true; // Assume válido por padrão
-  }
-
-  bool get isNameValid {
-    final state = currentState;
-    if (state is LoginValidation) {
-      return state.isNameValid;
-    }
-    return true; // Assume válido por padrão
-  }
-
-  bool get isFormValid {
-    final state = currentState;
-    if (state is LoginValidation) {
-      return state.isFormValid;
-    }
-    return false;
-  }
-
-  // Métodos que disparam eventos no BLoC - mesmo comportamento do login
+  /// Simula criação de conta e marca que o usuário possui conta
   Future<void> performCadastro(String email, String name) async {
-    _loginBloc.add(PerformLogin(email, name)); // Reutiliza mesma lógica
+    if (_isLoading) return;
+    _isLoading = true;
+    _hasError = false;
+    _errorMessage = null;
+    _isSuccess = false;
+    notifyListeners();
+
+    try {
+      // Simular chamada de rede / criação de conta
+      await Future.delayed(const Duration(seconds: 2));
+
+      // Criar usuário mock
+      _user = UserModel(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        name: name,
+        email: email,
+        createdAt: DateTime.now(),
+        lastLoginAt: DateTime.now(),
+      );
+
+      _isSuccess = true;
+    } catch (e) {
+      _hasError = true;
+      _errorMessage = 'Erro ao criar conta: ${e.toString()}';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void validateEmail(String email) {
-    _loginBloc.add(ValidateEmail(email));
+    // validação local opcional
+    // ...não necessário aqui
   }
 
-  void validateName(String name) {
-    _loginBloc.add(ValidateName(name));
-  }
+  void validateName(String name) {}
 
-  void validateForm(String email, String name) {
-    _loginBloc.add(ValidateForm(email, name));
-  }
+  void validateForm(String email, String name) {}
 
   void clearError() {
-    _loginBloc.add(const ClearLoginError());
+    _hasError = false;
+    _errorMessage = null;
+    notifyListeners();
   }
 
   @override
   void dispose() {
-    // O BLoC é gerenciado pelo Provider no main.dart
     super.dispose();
   }
 }
